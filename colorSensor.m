@@ -10,3 +10,4 @@ while color ~= 3
   if color == 2
     manuel
   end
+end
