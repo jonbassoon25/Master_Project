@@ -5,6 +5,6 @@ while (true)
     fprintf("%d cm\n", distance);
 
     if (distance < 25)
-        brick.playTone(500, 1);
+        brick.playTone(100, 500, 100);
     end
 end
