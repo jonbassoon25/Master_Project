@@ -1,13 +1,26 @@
+brick = ConnectBrick('PHIL');
+
 brick.SetColorMode(3, 2);
-color = brick.ColorCode(3);
-while color ~= 3
-  if color == 5
-    stop(1)
-  end
-  if color == 4
-    manuel
-  end
-  if color == 2
-    manuel
+
+while true
+  color = brick.ColorCode(3);
+
+  switch color
+      case 0
+          disp("No color");
+      case 1
+          disp("Black");
+      case 2
+          disp("Blue");
+      case 3
+          disp("Green");
+      case 4
+          disp("Yellow");
+      case 5
+          disp("Red");
+      case 6
+          disp("White");
+      case 7
+          disp("Brown");
   end
 end
