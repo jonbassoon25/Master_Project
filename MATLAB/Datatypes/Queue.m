@@ -54,5 +54,19 @@ classdef Queue < handle
                 value = current.value;
             end
         end
+
+        function Set(queue, index, value)
+            if (index >= queue.length)
+                error("Index %d out of bounds for length %d", index, queue.length);
+            elseif (index == queue.length - 1)
+                queue.tail.value = value;
+            else
+                current = queue.head;
+                for i = 1:index
+                    current = current.next;
+                end
+                current.value = value;
+            end
+        end
     end
 end

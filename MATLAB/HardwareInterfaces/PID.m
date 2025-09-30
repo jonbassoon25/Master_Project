@@ -17,6 +17,7 @@ classdef PID < handle
         derivativeTimeSum
 
         proportionalErrorValue
+        lastPEV
 
         % Proportional Gain
         pGain
@@ -52,18 +53,22 @@ classdef PID < handle
             pid.proportionalErrorValue = 0;
         end
 
-        function updateErrorState(pid, newIEV, newPEV, newDEV, ellapsedTime)
+        function updateErrorState(pid, error, ellapsedTime)
             % Update the error state of this PID with a
             %   new Integral Error Value
             %   new Proportional Error Value
             %   new Derivative Error Value
 
             % Update proportional error value
-            pid.proportionalErrorValue = newPEV;
+            lastError = pid.proportionalErrorValue;
+            pid.proportionalErrorValue = error;
+
+            integralError = error * ellapsedTime;
+            derivativeError = error - lastError;
             
             % Update Integral Values
-            pid.integralErrorValues.Enqueue(newIEV);
-            pid.integralErrorSum = pid.integralErrorSum + newIEV;
+            pid.integralErrorValues.Enqueue(integralError);
+            pid.integralErrorSum = pid.integralErrorSum + integralError;
             pid.integralTimeValues.Enqueue(ellapsedTime);
             pid.integralTimeSum = pid.integralTimeSum + ellapsedTime;
             while (pid.integralTimeSum > pid.targetIntegralTime)
@@ -72,8 +77,8 @@ classdef PID < handle
             end
 
             % Update Derivative Values
-            pid.derivativeErrorValues.Enqueue(newDEV);
-            pid.derivativeErrorSum = pid.derivativeErrorSum + newDEV;
+            pid.derivativeErrorValues.Enqueue(derivativeError);
+            pid.derivativeErrorSum = pid.derivativeErrorSum + derivativeError;
             pid.derivativeTimeValues.Enqueue(ellapsedTime);
             pid.derivativeTimeSum = pid.derivativeTimeSum + ellapsedTime;
             while (pid.derivativeTimeSum > pid.targetDerivativeTime)
@@ -99,7 +104,13 @@ classdef PID < handle
                 derivativeError = 0;
             end
 
-            controlOutput = pid.pGain * (proportionalError + integralError + derivativeError);
+            controlOutput = clip(pid.pGain * (proportionalError + integralError + derivativeError), -1, 1);
+
+            % Stop windup behavior if the max output is reached
+            if (controlOutput == 0)
+                pid.integralErrorSum = pid.integralErrorSum - pid.integralErrorValues.Get(pid.integralErrorValues.length - 1);
+                pid.integralErrorValues.Set(pid.integralErrorValues.length - 1, 0);
+            end
         end
     end
 end
