@@ -85,11 +85,22 @@ classdef Motor < handle
 
             if (motor.movementMode == 1)
                 % Manage the motor angle
+                controlOutput = motor.anglePID.calculateControlOutput();
                 
             elseif (motor.movementMode == 2)
                 % Manage the motor velocity 
+                controlOutput = motor.velocityPID.calculateControlOutput();
                 
+            else
+                controlOutput = 0;
             end
+
+            motor.brick.MoveMotor(motor.port, controlOutput * 100);
+        end
+
+        function Stop(motor, brake)
+            motor.ClearTargets();
+            motor.brick.StopMotor(motor.port, brake);
         end
 
         
