@@ -106,6 +106,8 @@ classdef PID < handle
 
             controlOutput = clip(pid.pGain * (proportionalError + integralError + derivativeError), -1, 1);
 
+            fprintf("Requesting %.2f% motor power", controlOutput * 100);
+
             % Stop windup behavior if the max output is reached
             if (controlOutput == 0)
                 pid.integralErrorSum = pid.integralErrorSum - pid.integralErrorValues.Get(pid.integralErrorValues.length - 1);
