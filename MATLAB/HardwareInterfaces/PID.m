@@ -52,17 +52,14 @@ classdef PID < handle
             pid.proportionalErrorValue = 0;
         end
 
-        function updateErrorState(pid, error, ellapsedTime)
+        function updateErrorState(pid, newIEV, newPEV, newDEV, ellapsedTime)
             % Update the error state of this PID with a
             %   new Integral Error Value
             %   new Proportional Error Value
             %   new Derivative Error Value
 
             % Update proportional error value
-            pid.proportionalErrorValue = error;
-
-            integralError = error * ellapsedTime;
-            derivativeError = 
+            pid.proportionalErrorValue = newPEV;
             
             % Update Integral Values
             pid.integralErrorValues.Enqueue(newIEV);
