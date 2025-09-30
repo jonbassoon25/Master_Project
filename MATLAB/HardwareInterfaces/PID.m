@@ -2,7 +2,7 @@
 %   https://developer.wildernesslabs.co/Hardware/Reference/Algorithms/Proportional_Integral_Derivative/Standard_PID_Algorithm/
 
 classdef PID < handle
-    % A PID controller to be used for many applications
+    % A Universal PID Controller
 
     properties (Access = protected)
         % Error tracker values

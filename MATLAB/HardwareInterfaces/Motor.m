@@ -67,11 +67,11 @@ classdef Motor < handle
 
             if (motor.movementMode == 1)
                 % Update the angle PID
-                motor.anglePID.updateErrorState()
+                motor.anglePID.updateErrorState(motor.currentAngle - motor.angleTarget, deltaTime);
 
             elseif (motor.movementMode == 2)
                 % Update the velocity PID
-                
+                motor.velocityPID.updateErrorState(motor.currentVelocity - motor.velocityTarget, deltaTime);
             end
         end
 
