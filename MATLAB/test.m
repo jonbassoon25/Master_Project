@@ -2,7 +2,7 @@ brick = ConnectBrick('GROUP6');
 
 motor = Motor(brick, 'A');
 
-motor.SetVelocityTarget(720 * 4); % Set velocity target to 720 degrees per second
+motor.SetVelocityTarget(720 * 4); % Set velocity target to 720 * 4 degrees per second
 updateCount = 120;
 for i = 1:updateCount
     motor.ManageSetTargets();
