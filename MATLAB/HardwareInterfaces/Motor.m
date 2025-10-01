@@ -43,19 +43,19 @@ classdef Motor < handle
             motor.UpdateData();
 
             % Set initial targets & movement mode
-            motor.angleTarget = null;
-            motor.velocityTarget = null;
+            motor.angleTarget = [];
+            motor.velocityTarget = [];
             motor.movementMode = 0;
 
             % Initialize PID controller variables
-            motor.anglePID = PID(0.05, 255, 5);
-            motor.velocityPID = PID(0.05, 255, 0);
+            motor.anglePID = PID(0.005, 255, 5);
+            motor.velocityPID = PID(0.00031, 80, 0.01325);
         end
 
         function UpdateData(motor)
             % Updates the current motor data & active PID
             deltaTime = toc(motor.measurementClock);
-            fprinf("Last control loop took %.2f seconds.", deltaTime);
+            fprintf("Last control loop took %.2f seconds\n", deltaTime);
             motor.measurementClock = tic;
 
             newAngle = motor.brick.GetMotorAngle(motor.port);
@@ -65,6 +65,10 @@ classdef Motor < handle
             motor.currentAngle = newAngle;
             motor.currentVelocity = newVelocity;
             motor.currentAcceleration = newAcceleration;
+
+            fprintf("Current Angle: %.2f\n", newAngle);
+            fprintf("Current Velocity: %.2f\n", newVelocity);
+            fprintf("Current Acceleration: %.2f\n", newAcceleration);
 
             if (motor.movementMode == 1)
                 % Update the angle PID
@@ -78,19 +82,19 @@ classdef Motor < handle
 
         function ManageSetTargets(motor)
             % Manages the currently set targets so that they are met
-            %   Will ignore the angle target if the angle target is null
-            %   and the velocity target is null
+            %   Will ignore the angle target if the angle target is []
+            %   and the velocity target is []
 
             % Get the current motor data values
             motor.UpdateData();
 
             if (motor.movementMode == 1)
                 % Manage the motor angle
-                controlOutput = motor.anglePID.calculateControlOutput();
+                controlOutput = -motor.anglePID.calculateControlOutput();
                 
             elseif (motor.movementMode == 2)
                 % Manage the motor velocity 
-                controlOutput = motor.velocityPID.calculateControlOutput();
+                controlOutput = -motor.velocityPID.calculateControlOutput();
                 
             else
                 controlOutput = 0;
@@ -107,8 +111,8 @@ classdef Motor < handle
         
         % Target Management Methods
         function ClearTargets(motor)
-            motor.angleTarget = null;
-            motor.velocityTarget = null;
+            motor.angleTarget = [];
+            motor.velocityTarget = [];
             motor.movementMode = 0;
             motor.anglePID.reset();
             motor.velocityPID.reset();

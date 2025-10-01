@@ -81,7 +81,7 @@ classdef PID < handle
             pid.derivativeErrorSum = pid.derivativeErrorSum + derivativeError;
             pid.derivativeTimeValues.Enqueue(ellapsedTime);
             pid.derivativeTimeSum = pid.derivativeTimeSum + ellapsedTime;
-            while (pid.derivativeTimeSum > pid.targetDerivativeTime)
+            while (pid.derivativeTimeSum > pid.targetDerivativeTime && pid.derivativeErrorValues.length > 1)
                 pid.derivativeErrorSum = pid.derivativeErrorSum - pid.derivativeErrorValues.Dequeue();
                 pid.derivativeTimeSum = pid.derivativeTimeSum - pid.derivativeTimeValues.Dequeue();
             end
@@ -104,15 +104,25 @@ classdef PID < handle
                 derivativeError = 0;
             end
 
-            controlOutput = clip(pid.pGain * (proportionalError + integralError + derivativeError), -1, 1);
+            controlOutput = pid.pGain * cast((proportionalError + integralError + derivativeError), "double");
 
-            fprintf("Requesting %.2f% motor power", controlOutput * 100);
-
-            % Stop windup behavior if the max output is reached
-            if (controlOutput == 0)
+            fprintf("Raw control out: %f\n", controlOutput);
+    
+            if (controlOutput > 1) 
+                % Stop windup behavior if the max output is reached
                 pid.integralErrorSum = pid.integralErrorSum - pid.integralErrorValues.Get(pid.integralErrorValues.length - 1);
                 pid.integralErrorValues.Set(pid.integralErrorValues.length - 1, 0);
+
+                controlOutput = 1;
+            elseif (controlOutput < -1)
+                % Stop windup behavior if the max output is reached
+                pid.integralErrorSum = pid.integralErrorSum - pid.integralErrorValues.Get(pid.integralErrorValues.length - 1);
+                pid.integralErrorValues.Set(pid.integralErrorValues.length - 1, 0);
+
+                controlOutput = -1;
             end
+
+            fprintf("Requesting %.2f%% motor power: %f(%0.2f, %0.2f, %0.2f)\n", controlOutput * 100, pid.pGain, proportionalError, integralError, derivativeError);
         end
     end
 end
