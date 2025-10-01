@@ -55,6 +55,7 @@ classdef Motor < handle
         function UpdateData(motor)
             % Updates the current motor data & active PID
             deltaTime = toc(motor.measurementClock);
+            fprinf("Last control loop took %.2f seconds.", deltaTime);
             motor.measurementClock = tic;
 
             newAngle = motor.brick.GetMotorAngle(motor.port);
