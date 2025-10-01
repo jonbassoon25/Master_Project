@@ -1,5 +1,5 @@
 % Initialize the EV3 brick
-brick = ConnectBrick('PHIL');
+brick = ConnectBrick('GROUP6');
 reading = brick.TouchPressed(1);
 
 while 1

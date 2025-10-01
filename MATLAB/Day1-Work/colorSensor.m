@@ -1,4 +1,4 @@
-brick = ConnectBrick('PHIL');
+brick = ConnectBrick('GROUP6');
 
 brick.SetColorMode(3, 2);
 

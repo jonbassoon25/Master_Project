@@ -1,4 +1,4 @@
-brick = ConnectBrick('PHIL');
+brick = ConnectBrick('GROUP6');
 
 while (true)
     distance = brick.UltrasonicDist(2);
