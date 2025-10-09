@@ -120,7 +120,15 @@ classdef Motor < handle
 
         function SetAngleTarget(motor, target)
             motor.ClearTargets();
-            motor.angleTarget = target;
+            motor.UpdateData();
+            motor.angleTarget = target + fix(motor.currentAngle / 360) * 360;
+            motor.movementMode = 1;
+        end
+
+        function SetRelAngleTarget(motor, relTarget)
+            motor.ClearTargets();
+            motor.UpdateData();
+            motor.angleTarget = relTarget + motor.currentAngle;
             motor.movementMode = 1;
         end
 
@@ -136,8 +144,16 @@ classdef Motor < handle
             angle = motor.currentAngle;
         end
 
+        function angleTarget = GetCurrentAngleTarget(motor)
+            angleTarget = motor.angleTarget;
+        end
+
         function angularVelocity = GetCurrentVelocity(motor)
             angularVelocity = motor.currentVelocity;
+        end
+
+        function angularVelocityTarget = GetCurrentVelocityTarget(motor)
+            angularVelocityTarget = motor.velocityTarget;
         end
 
         function angularAcceleration = GetCurrentAcceleration(motor)
