@@ -1,4 +1,4 @@
-classdef QueueElement < handle
+classdef LinkedListElement < handle
     % A linked-list element that is part of a stack
 
     properties (Access = public)
@@ -7,7 +7,7 @@ classdef QueueElement < handle
     end
 
     methods
-        function element = QueueElement(value)
+        function element = LinkedListElement(value)
             % Construct an instance of this class
             element.value = value;
             element.next = [];

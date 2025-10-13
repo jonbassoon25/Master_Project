@@ -18,7 +18,7 @@ classdef Queue < handle
 
         function Enqueue(queue, value)
             % Adds an element to the rear of the queue
-            nextElement = QueueElement(value);
+            nextElement = LinkedListElement(value);
             if (isempty(queue.head))
                 queue.head = nextElement;
             end
