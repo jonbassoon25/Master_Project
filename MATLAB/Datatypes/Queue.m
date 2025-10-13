@@ -2,9 +2,12 @@ classdef Queue < handle
     % A queue datatype since MATLAB doens't implement one
     %   and arrays/vectors are inefficient for resizing
 
-    properties
+    properties (Access = protected)
         head
         tail
+    end
+
+    properties (Access = public)
         length
     end
 

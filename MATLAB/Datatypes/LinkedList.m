@@ -1,9 +1,12 @@
 classdef LinkedList < handle
     % A linked list datastructure
 
-    properties
+    properties (Access = protected)
         head
         tail
+    end
+
+    properties (Access = public)
         length
     end
 
