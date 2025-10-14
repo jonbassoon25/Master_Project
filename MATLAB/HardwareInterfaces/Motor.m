@@ -1,8 +1,12 @@
 classdef Motor < handle
     % A Motor object represents a motor connected to an EV3 brick
 
+    properties (Constant, Access = private)
+        DEBUG logical = false %
+    end
+
     properties (Constant, Access = protected)
-        ANGLE_PID PID = PID(0.00062, 16, 0.021);           % The angle PID controller for this motor
+        ANGLE_PID PID = PID(0.00062, 16, 0.021);      % The angle PID controller for this motor
         VELOCITY_PID PID = PID(0.00031, 80, 0.01325); % The velocity PID controller for this motor
     end
 

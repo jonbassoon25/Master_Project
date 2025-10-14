@@ -1,6 +1,10 @@
 classdef DriveTrain < handle
     % The DriveTrain controls the two motors of a vehicle to perform complex manuevers
     
+    properties (Constant, Access=private)
+        DEBUG logical = false % Display debug information at runtime
+    end
+
     properties (Constant, Access = protected)
         WHEEL_RADIUS double = 1.5              % The radius of both wheels in cm
         TURNING_RADIUS double = 7.0            % Distance between the driveTrain's center and the points of contact of its wheels in cm
@@ -16,7 +20,7 @@ classdef DriveTrain < handle
     end
 
 
-    methods (Access = private)
+    methods (Access = protected)
         function angularVel = VelocityToAngularVelocity(driveTrain, velocity)
             % Converts a velocity to an angular velocity
             arguments (Input)
@@ -27,6 +31,19 @@ classdef DriveTrain < handle
                 angularVel double % The converted angular velocity in deg/sec
             end
             angularVel = 180/pi * (velocity / driveTrain.WHEEL_RADIUS);
+        end
+
+        function wheelRotations = DriveTrainRotationsToWheelRotations(driveTrain, degrees)
+            % Converts a counter clockwise rotation of the drivetrain to
+            % a counter clockwise rotation of its wheels
+            arguments (Input)
+                driveTrain DriveTrain % The DriveTrain Object
+                degrees double        % The degrees counter clockwise that the drivetrain is rotating
+            end
+            arguments (Output)
+                wheelRotations double % The converted degrees counter clockwise that the wheels must rotate
+            end
+            wheelRotations = degrees * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
         end
     end
 
@@ -52,13 +69,29 @@ classdef DriveTrain < handle
                 driveTrain DriveTrain          % The DriveTrain Object
                 degreesCounterClockwise double % The number of degrees counter clockwise (left) to turn
             end
+            if (driveTrain.DEBUG) 
+                fprintf("Turning Left %.2f degrees\n", degreesCounterClockwise);
+            end
             driveTrain.leftMotor.SetRelAngleTarget(degreesCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS));
             driveTrain.rightMotor.SetRelAngleTarget(-degreesCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS));
             
-            % Manage wheel angles until the error threshold is met
-            while (abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle()) >= driveTrain.TURNING_ERROR_THRESHOLD || abs(driveTrain.rightMotor.GetCurrentAngleTarget() - driveTrain.rightMotor.GetCurrentAngle()) >= driveTrain.TURNING_ERROR_THRESHOLD) 
+            % Calculate initial error values
+            leftError = abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle());
+            rightError = abs(driveTrain.rightMotor.GetCurrentAngleTarget() - driveTrain.rightMotor.GetCurrentAngle());
+            while (leftError >= driveTrain.TURNING_ERROR_THRESHOLD || rightError >= driveTrain.TURNING_ERROR_THRESHOLD) 
+                if (driveTrain.DEBUG)
+                    fprintf("Left Wheel Turning Error: %.2f\n", leftError);
+                    fprintf("Right Wheel Turning Error: %.2f\n", rightError);
+                    fprintf("Error Threshold: %f\n", driveTrain.TURNING_ERROR_THRESHOLD);
+                end
+
+                % Manage wheel angles
                 driveTrain.leftMotor.ManageSetTargets();
                 driveTrain.leftMotor.ManageSetTargets();
+                
+                % Recalculate error values
+                leftError = abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle());
+                rightError = abs(driveTrain.rightMotor.GetCurrentAngleTarget() - driveTrain.rightMotor.GetCurrentAngle());
             end
         end
 
@@ -80,6 +113,11 @@ classdef DriveTrain < handle
             targetAVal = driveTrain.VelocityToAngularVelocity(targetVelocity);
             driveTrain.leftMotor.SetVelocityTarget(targetAVal * driveTrain.LEFT_VELOCITY_MULTIPLIER);
             driveTrain.rightMotor.SetVelocityTarget(targetAVal * driveTrain.RIGHT_VELOCITY_MULTIPLIER);
+
+            if (driveTrain.DEBUG)
+                fprintf("Setting a forward velocity of %f cm/s\n", targetVelocity);
+                fprintf("Calculated wheel velocity: %f deg/sec\n", targetAVal);
+            end
         end
 
         function SetBackwardVelocity(driveTrain, targetVelocity)
@@ -99,9 +137,13 @@ classdef DriveTrain < handle
                 angularVelocityCounterClockwise double % The new angular velocity counter clockwise (left) in deg/s
             end
 
+            if (driveTrain.DEBUG)
+                fprintf("Setting a mixed movement target of %.2f cm/s forward and %.2f deg/s counter clockwise\n", forwardVelocity, angularVelocityCounterClockwise);
+            end
+
             % Calculate target velocities
-            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
-            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
+            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) - driveTrain.DriveTrainRotationsToWheelRotations(angularVelocityCounterClockwise);
+            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) + driveTrain.DriveTrainRotationsToWheelRotations(angularVelocityCounterClockwise);
         
             % Set target velocities
             driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.LEFT_VELOCITY_MULTIPLIER);
