@@ -2,7 +2,7 @@ classdef Motor < handle
     % A Motor object represents a motor connected to an EV3 brick
 
     properties (Constant, Access = private)
-        DEBUG logical = false %
+        DEBUG logical = false % Display debug information at runtime
     end
 
     properties (Constant, Access = protected)
@@ -60,8 +60,9 @@ classdef Motor < handle
                 motor Motor % This Motor object
             end
             deltaTime = toc(motor.measurementClock);
-            fprintf("Last control loop took %.2f seconds\n", deltaTime);
             motor.measurementClock = tic;
+
+            
 
             newAngle = motor.brick.GetMotorAngle(motor.port);
             newVelocity = (newAngle - motor.currentAngle) / deltaTime;
@@ -71,9 +72,12 @@ classdef Motor < handle
             motor.currentVelocity = newVelocity;
             motor.currentAcceleration = newAcceleration;
 
-            fprintf("Current Angle: %.2f\n", newAngle);
-            fprintf("Current Velocity: %.2f\n", newVelocity);
-            fprintf("Current Acceleration: %.2f\n", newAcceleration);
+            if (motor.DEBUG)
+                fprintf("Last control loop took %.2f seconds\n", deltaTime);
+                fprintf("Current Angle: %.2f\n", newAngle);
+                fprintf("Current Velocity: %.2f\n", newVelocity);
+                fprintf("Current Acceleration: %.2f\n", newAcceleration);
+            end
 
             if (motor.movementMode == 1)
                 % Update the angle PID
@@ -104,6 +108,10 @@ classdef Motor < handle
                 
             else
                 controlOutput = 0;
+            end
+
+            if (motor.DEBUG)
+                fprintf("Motor %s Output Power: %.2f%%\n", motor.port, controlOutput * 100);
             end
 
             motor.brick.MoveMotor(motor.port, controlOutput * 100);
