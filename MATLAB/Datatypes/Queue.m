@@ -1,26 +1,32 @@
 classdef Queue < handle
-    % A queue datatype since MATLAB doens't implement one
-    %   and arrays/vectors are inefficient for resizing
+    % A Queue Datatype
 
     properties (Access = protected)
-        head
-        tail
+        head % The first element of the queue or [] if there is none
+        tail % The last element of the queue or [] if there is none
     end
 
     properties (Access = public)
-        length
+        length uint32 % The length of the queue
     end
 
     methods
-        function stack = Queue()
-            % Construct an instance of this class
-            stack.head = [];
-            stack.tail = [];
-            stack.length = 0;
+        function queue = Queue()
+            % Initializes the properties of a new Queue object
+            arguments (Output)
+                queue Queue % This Queue Object
+            end
+            queue.head = [];
+            queue.tail = [];
+            queue.length = 0;
         end
 
         function Enqueue(queue, value)
-            % Adds an element to the rear of the queue
+            % Adds a new element to the back of the queue
+            arguments (Input)
+                queue Queue % This Queue Object
+                value       % The value of the new element
+            end
             nextElement = LinkedListElement(value);
             if (isempty(queue.head))
                 queue.head = nextElement;
@@ -34,6 +40,12 @@ classdef Queue < handle
 
         function value = Dequeue(queue)
             % Pops an element from the front of the queue
+            arguments (Input)
+                queue Queue % This Queue Object
+            end
+            arguments (Output)
+                value % The value of the removed element or [] if there is none
+            end
             if (queue.length == 0)
                 value = [];
             else
@@ -44,9 +56,13 @@ classdef Queue < handle
         end
 
         function value = Get(queue, index)
-            % Returns the value of an element at the given index
+            % Get the value of the element at the provided index
+            arguments (Input)
+                queue Queue  % This Queue Object
+                index uint32 % The index to retrieve the value of
+            end
             if (index >= queue.length)
-                error("Index %d out of bounds for length %d", index, queue.length);
+                error("Index %d out of bounds for queue of length %d", index, queue.length);
             elseif (index == queue.length - 1)
                 value = queue.tail.value;
             else
@@ -59,8 +75,14 @@ classdef Queue < handle
         end
 
         function Set(queue, index, value)
+            % Sets the value at the provided index of this linked list to the provided value
+            arguments (Input)
+                queue Queue  % This Queue Object
+                index uint32 % The index of the queue to set the value of
+                value        % The value to set the provided index of the queue to
+            end
             if (index >= queue.length)
-                error("Index %d out of bounds for length %d", index, queue.length);
+                error("Index %d out of bounds for queue of length %d", index, queue.length);
             elseif (index == queue.length - 1)
                 queue.tail.value = value;
             else
