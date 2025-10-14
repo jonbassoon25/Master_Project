@@ -12,8 +12,7 @@ classdef LinkedList < handle
 
     methods (Access = protected)
         function CheckOutOfRange(list, index)
-            % Throws an error if the provided index is out of range for
-            % this linked list
+            % Throws an error if the provided index is out of range
             arguments (Input)
                 list LinkedList % This LinkedList Object
                 index uint32    % The index to check
@@ -66,8 +65,7 @@ classdef LinkedList < handle
         end
 
         function Set(list, index, value)
-            % Sets the value at the provided index of this linked list to
-            % the provided value
+            % Sets the value at the provided index of this linked list to the provided value
             arguments (Input)
                 list LinkedList % This LinkedList Object
                 index uint32    % The index of the linked list to set the value of
@@ -152,8 +150,7 @@ classdef LinkedList < handle
         end
 
         function bool = Contains(list, value)
-            % Determines if this linked list contains any elements that
-            % have a value equal to the provided value
+            % Determines if any elements of the linked list have a value equal to the provided value
             arguments (Input)
                 list LinkedList % This LinkedList Object
                 value           % The value to check for
@@ -171,8 +168,7 @@ classdef LinkedList < handle
         end
 
         function Remove(list, value)
-            % Removes all elements with a value equal to the provided value
-            % in this linked list
+            % Removes all elements of the linked list with a value equal to the provided value
             arguments (Input)
                 list LinkedList % This LinkedList Object
                 value           % The value to remove
