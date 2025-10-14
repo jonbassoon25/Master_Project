@@ -2,57 +2,103 @@ classdef LinkedList < handle
     % A linked list datastructure
 
     properties (Access = protected)
-        head
-        tail
+        head % The first LinkedListElement of the linked list or [] if there is none
+        tail % The last LinkedListElement of the linked list or [] if there is none
     end
 
     properties (Access = public)
-        length
+        length uint32 % The length of the linked list
     end
 
     methods (Access = protected)
         function CheckOutOfRange(list, index)
+            % Throws an error if the provided index is out of range for
+            % this linked list
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                index uint32    % The index to check
+            end
+
             if (index < 0 || index >= list.length) 
-                error("Index %d out of range for length %d", index, list.length);
+                error("Index %d out of range for linked list of length %d", index, list.length);
             end
         end
     end
 
     methods (Access = public)
         function list = LinkedList()
-            % Construct an instance of this class
+            % Initializes the properties of a new LinkedList object
+            arguments (Output)
+                list LinkedList % This LinkedList Object
+            end
             list.head = [];
             list.tail = [];
             list.length = 0;
         end
 
         function value = Get(list, index)
+            % Gets the value at the provided index of this linked list
+            arguments(Input)
+                list LinkedList % This LinkedList Object
+                index uint32    % The index to retrieve the value of
+            end
+            arguments(Output)
+                value
+            end
+            
+            % Check if the index is out of range
             list.CheckOutOfRange(index);
-            if (index == list.length - 1) 
+
+            % If the index is of the last element of the linked list
+            if (index + 1 == list.length) 
+                % Get the value of the last element of the linked list
                 value = list.tail.value;
             else
+                % Get the value of the provided index of the linked list
+                i = 0;
                 curNode = list.head;
-                for i = 0:index - 1
+                while (i < index)
                     curNode = curNode.next;
+                    i = i + 1;
                 end
                 value = curNode.value;
             end
         end
 
         function Set(list, index, value)
+            % Sets the value at the provided index of this linked list to
+            % the provided value
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                index uint32    % The index of the linked list to set the value of
+                value           % The value to set the provided index of the linked list to
+            end
+
+            % Check if the index is out of range
             list.CheckOutOfRange(index);
-            if (index == list.length - 1) 
+
+            % If the index is of the last element of the linked list
+            if (index + 1 == list.length) 
+                % Set the value of the last element of the linked list
                 list.tail.value = value;
             else
+                % Set the value of the provided index of the linked list
+                i = 0;
                 curNode = list.head;
-                for i = 0:index - 1
+                while (i < index)
                     curNode = curNode.next;
+                    i = i + 1;
                 end
                 curNode.value = value;
             end
         end
 
         function Append(list, value)
+            % Adds a new element to the end of the linked list
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                value           % The value of the new linked list element
+            end
             newNode = LinkedListElement(value);
             if (isempty(list.head))
                 list.head = newNode;
@@ -63,10 +109,22 @@ classdef LinkedList < handle
         end
 
         function Insert(list, index, value)
+            % Inserts a new element to the provided index of the linked list
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                index uint32    % The index of the new element
+                value           % The value of the new element
+            end
+
+            % Check if the index is out of range
             if (index < 0 || index > list.length) 
                 error("Index %d out of range for length %d", index, list.length);
-            elseif (index == list.length) 
+            end
+
+            % If the index is the end of the list
+            if (index == list.length) 
                 list.Append(value);
+            % If the index is the beginning of the list
             elseif (index == 0)
                 newHead = LinkedListElement(value);
                 newHead.next = list.head;
@@ -84,12 +142,22 @@ classdef LinkedList < handle
         end
 
         function Clear(list)
+            % Removes all elements from this linked list
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+            end
             list.head = [];
             list.tail = [];
             list.length = 0;
         end
 
-        function bool = Contains(list, value) 
+        function bool = Contains(list, value)
+            % Determines if this linked list contains any elements that
+            % have a value equal to the provided value
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                value           % The value to check for
+            end
             curNode = list.head;
             bool = false;
             for i = 0:list.length - 1
@@ -103,20 +171,34 @@ classdef LinkedList < handle
         end
 
         function Remove(list, value)
-            % Removes all instances of value in the linked list
-            if (~isempty(list.head) && list.head.value == value)
+            % Removes all elements with a value equal to the provided value
+            % in this linked list
+            arguments (Input)
+                list LinkedList % This LinkedList Object
+                value           % The value to remove
+            end
+
+            % While the head of the linked list has a value equal to the
+            % provided value
+            while (~isempty(list.head) && list.head.value == value)
                 list.head = list.head.next;
                 list.length = list.length - 1;
                 if (list.length == 0)
                     list.tail = [];
                 end
-            elseif (~isempty(list.tail) && list.tail.value == value)
+            end
+            % While the tail of the linked list has a value equal to the
+            % provided value
+            %    Note: The head of the linked list will always have a value
+            %    that isn't the value to remove if the tail has a value
+            while (~isempty(list.tail) && list.tail.value == value)
                 curNode = list.head;
                 for i = 0:list.length - 2
                     curNode = curNode.next;
                 end
                 list.tail = curNode;
             end
+            % Remove all elements with a value equal to the value to remove
             curNode = list.head;
             while (~isempty(curNode) && ~isempty(curNode.next))
                 if (curNode.next.value == value)
