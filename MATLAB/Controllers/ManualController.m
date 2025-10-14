@@ -10,9 +10,6 @@ classdef ManualController < handle
         targetAngularVelocity
     end
 
-    methods (Access = protected)
-
-    end
 
     methods (Access = public)
         function controller = ManualController(keyboard, driveTrain)
@@ -25,6 +22,11 @@ classdef ManualController < handle
             controller.driveTrain = driveTrain;
             controller.targetForwardVelocity = 0.0;
             controller.targetAngularVelocity = 0.0; % Counter clockwise
+        end
+
+        function Reset(controller)
+            controller.targetForwardVelocity = 0.0;
+            controller.targetAngularVelocity = 0.0;
         end
 
         function Update(controller)
