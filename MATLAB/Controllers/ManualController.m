@@ -34,7 +34,7 @@ classdef ManualController < handle
         function Reset(controller)
             % Resets the control output variables & stops the controlled DriveTrain
             arguments
-                controller DriveTrain % This DriveTrain Object
+                controller ManualController % This ManualController Object
             end
 
             controller.targetForwardVelocity = 0.0;
@@ -45,7 +45,7 @@ classdef ManualController < handle
         function Update(controller)
             % Updates the control output to the DriveTrain based on keyboard input
             arguments
-                controller DriveTrain % This DriveTrain Object
+                controller ManualController % This ManualController Object
             end
 
             fowardInput = isPressed("w");
