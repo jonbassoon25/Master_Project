@@ -6,16 +6,20 @@ classdef Keyboard < handle
     end
 
     properties (Access = protected)
-        keysDown LinkedList
-        inputWindow
+        keysDown LinkedList % A list of the currently pressed keys
+        inputWindow % The input window for key presses
     end
 
     methods (Access = protected)
         function PressKey(keyboard, key)
+            % Called when a key press needs to be recorded
+            arguments (Input)
+                keyboard Keyboard % This Keyboard object
+                key               % The value of the key that was pressed
+            end
             try
                 if (~keyboard.keysDown.Contains(key))
                     keyboard.keysDown.Append(key);
-                    %fprintf("%s\n", keyboard.keysDown.Get(keyboard.keysDown.length - 1));
                     if (keyboard.DEBUG) 
                         fprintf("Press %s, list length: %d\n", key, keyboard.keysDown.length);
                     end
@@ -26,6 +30,11 @@ classdef Keyboard < handle
         end
 
         function ReleaseKey(keyboard, key)
+            % Called when a key release needs to be recorded
+            arguments (Input)
+                keyboard Keyboard % This Keyboard object
+                key               % The value of the key that was released
+            end
             try
                 keyboard.keysDown.Remove(key);
                 if (keyboard.DEBUG) 
@@ -39,7 +48,10 @@ classdef Keyboard < handle
 
     methods (Access = public)
         function keyboard = Keyboard()
-            % Initialize the keyboard properties
+            % Initializes the properties of a new Keyboard object
+            arguments (Output)
+                keyboard Keyboard % The constructed Keyboard object
+            end
             keyboard.keysDown = LinkedList();
             keyboard.inputWindow = figure;
 
@@ -51,10 +63,17 @@ classdef Keyboard < handle
             text(1) = {'Click on this window and press any key to control the robot.'};
             textbox = annotation(keyboard.inputWindow, 'textbox',[0,0,1,1]);
             set(textbox,'String', text);
-
         end
 
         function bool = IsPressed(keyboard, key)
+            % Determines if a keyboard key is currently being pressed
+            arguments (Input)
+                keyboard Keyboard % This Keyboard object
+                key               % The value of the key to check
+            end
+            arguments (Output)
+                bool logical % Is the key pressed or not
+            end
             bool = keyboard.keysDown.Contains(key);
         end
 
