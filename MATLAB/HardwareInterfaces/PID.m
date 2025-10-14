@@ -1,6 +1,10 @@
 classdef PID < handle
     % A Proportional Integral Derivative Controller using the standard form of the PID algorithm
 
+    properties (Constant, Access = private)
+        DEBUG logical = false % Display debug information at runtime
+    end
+
     properties (Access = protected)
         integralErrorValues Queue     % A queue of the last n integral error values
         integralTimeValues Queue      % A queue of the measurement times of the recorded integral error values
@@ -112,8 +116,8 @@ classdef PID < handle
             end
 
             controlOutput = pid.pGain * cast((proportionalError + integralError + derivativeError), "double");
-
-            fprintf("Raw control out: %f\n", controlOutput);
+            rawControlOutput = controlOutput;
+            
     
             if (controlOutput > 1) 
                 % Stop windup behavior if the max output is reached
@@ -129,7 +133,10 @@ classdef PID < handle
                 controlOutput = -1;
             end
 
-            fprintf("Requesting %.2f%% motor power: %f(%0.2f, %0.2f, %0.2f)\n", controlOutput * 100, pid.pGain, proportionalError, integralError, derivativeError);
+            if (pid.DEBUG)
+                fprintf("Raw control out: %f\n", rawControlOutput);
+                fprintf("Requesting %.2f%% motor power: %f(%0.2f, %0.2f, %0.2f)\n", controlOutput * 100, pid.pGain, proportionalError, integralError, derivativeError);
+            end
         end
     end
 end
