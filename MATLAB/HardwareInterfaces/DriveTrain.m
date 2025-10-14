@@ -51,16 +51,12 @@ classdef DriveTrain < handle
                 driveTrain.leftMotor.ManageSetTargets();
                 driveTrain.leftMotor.ManageSetTargets();
             end
-            
-
         end
 
         function TurnRight(driveTrain, degreesClockwise)
             % Turns Right in place by the specified number of degrees
             driveTrain.TurnLeft(-degreesClockwise);
         end
-
-        
 
         function SetForwardVelocity(driveTrain, targetVelocity)
             % Sets this drivetrain's forward target velocity in cm/s
@@ -74,7 +70,16 @@ classdef DriveTrain < handle
             driveTrain.SetForwardVelocity(-targetVelocity);
         end
 
-        function ManageVelocityTarget(driveTrain)
+        function SetMixedMovementTargets(driveTrain, forwardVelocity, angularVelocityCounterClockwise)
+            % Sets mixed movement target velocities in cm/s
+            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius);
+            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius);
+        
+            driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.leftVelocityMultiplier);
+            driveTrain.rightMotor.SetVelocityTarget(rightMotorTargetAngularVelocity * driveTrain.rightVelocityMultiplier);
+        end
+
+        function ManageVelocityTargets(driveTrain)
             % Manages the forward velocity to match the set target
             driveTrain.leftMotor.ManageSetTargets();
             driveTrain.rightMotor.ManageSetTargets();
@@ -85,7 +90,5 @@ classdef DriveTrain < handle
             driveTrain.leftMotor.Stop(brake);
             driveTrain.rightMotor.Stop(brake);
         end
-
-  
     end
 end
