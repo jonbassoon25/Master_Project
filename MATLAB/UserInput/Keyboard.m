@@ -1,0 +1,54 @@
+classdef Keyboard < handle
+    % A keyboard user input interface
+    properties (Access = protected)
+        keysDown
+        inputWindow
+    end
+
+    methods (Access = protected)
+        function PressKey(keyboard, key)
+            try
+                if (~keyboard.keysDown.Contains(key))
+                    keyboard.keysDown.Append(key);
+                    fprintf("Press %s, list length: %d\n", key, keyboard.keysDown.length);
+                end
+            catch exception
+            end
+        end
+
+        function ReleaseKey(keyboard, key)
+            try
+                keyboard.keysDown.Remove(key);
+                fprintf("Release %s\n", key, keyboard.keysDown.length);
+            catch exception
+                keyboard.keysDown.Clear();
+            end
+        end
+    end
+
+    methods (Access = public)
+        function keyboard = Keyboard()
+            % Initialize the keyboard properites
+            keyboard.keysDown = LinkedList();
+            keyboard.inputWindow = figure;
+
+            % Setup keyboard event callbacks
+            set(keyboard.inputWindow, 'KeyPressFcn', @(h_obj, evt) keyboard.PressKey(evt.Key));
+            set(keyboard.inputWindow, 'KeyReleaseFcn', @(h_obj, evt) keyboard.ReleaseKey(evt.Key));
+
+            % Create text
+            text(1) = {'Click on this window and press any key to control the robot.'};
+            textbox = annotation(keyboard.inputWindow, 'textbox',[0,0,1,1]);
+            set(textbox,'String', text);
+
+        end
+
+        function bool = IsPressed(keyboard, key)
+            bool = keyboard.keysDown.Contains(key);
+        end
+
+        function delete(keyboard)
+            close(keyboard.inputWindow);
+        end
+    end
+end
