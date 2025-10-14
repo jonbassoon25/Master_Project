@@ -1,5 +1,5 @@
 classdef LinkedList < handle
-    % A linked list datastructure
+    % A linked list data type
 
     properties (Access = protected)
         head % The first LinkedListElement of the linked list or [] if there is none

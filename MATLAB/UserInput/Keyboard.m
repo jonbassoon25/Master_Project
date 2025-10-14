@@ -28,7 +28,7 @@ classdef Keyboard < handle
 
     methods (Access = public)
         function keyboard = Keyboard()
-            % Initialize the keyboard properites
+            % Initialize the keyboard properties
             keyboard.keysDown = LinkedList();
             keyboard.inputWindow = figure;
 

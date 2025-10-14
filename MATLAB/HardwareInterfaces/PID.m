@@ -9,7 +9,7 @@ classdef PID < handle
         integralErrorSum double       % The sum of the recorded integral error values
         integralTimeSum double        % The sum of the recorded integral measurement times
         derivativeErrorSum double     % The sum of the recorded derivative error values
-        derivativeTimeSum double      % The sum of the recorded derivative measurment times
+        derivativeTimeSum double      % The sum of the recorded derivative measurement times
         proportionalErrorValue double % The current proportional error value
         lastPEV double                % The last proportional error value
         pGain double                  % The proportional gain constant
@@ -53,25 +53,25 @@ classdef PID < handle
             pid.proportionalErrorValue = 0;
         end
 
-        function updateErrorState(pid, error, ellapsedTime)
+        function updateErrorState(pid, error, elapsedTime)
             % Update the error state of the PID controller
             arguments (Input)
                 pid PID             % The PID object
                 error double        % The current error of the control variable
-                ellapsedTime double % The time since the last measurement
+                elapsedTime double % The time since the last measurement
             end
             % Update proportional error value
             lastError = pid.proportionalErrorValue;
             pid.proportionalErrorValue = error;
 
-            integralError = error * ellapsedTime;
+            integralError = error * elapsedTime;
             derivativeError = error - lastError;
             
             % Update Integral Values
             pid.integralErrorValues.Enqueue(integralError);
             pid.integralErrorSum = pid.integralErrorSum + integralError;
-            pid.integralTimeValues.Enqueue(ellapsedTime);
-            pid.integralTimeSum = pid.integralTimeSum + ellapsedTime;
+            pid.integralTimeValues.Enqueue(elapsedTime);
+            pid.integralTimeSum = pid.integralTimeSum + elapsedTime;
             while (pid.integralTimeSum > pid.targetIntegralTime)
                 pid.integralErrorSum = pid.integralErrorSum - pid.integralErrorValues.Dequeue();
                 pid.integralTimeSum = pid.integralTimeSum - pid.integralTimeValues.Dequeue();
@@ -80,8 +80,8 @@ classdef PID < handle
             % Update Derivative Values
             pid.derivativeErrorValues.Enqueue(derivativeError);
             pid.derivativeErrorSum = pid.derivativeErrorSum + derivativeError;
-            pid.derivativeTimeValues.Enqueue(ellapsedTime);
-            pid.derivativeTimeSum = pid.derivativeTimeSum + ellapsedTime;
+            pid.derivativeTimeValues.Enqueue(elapsedTime);
+            pid.derivativeTimeSum = pid.derivativeTimeSum + elapsedTime;
             while (pid.derivativeTimeSum > pid.targetDerivativeTime && pid.derivativeErrorValues.length > 1)
                 pid.derivativeErrorSum = pid.derivativeErrorSum - pid.derivativeErrorValues.Dequeue();
                 pid.derivativeTimeSum = pid.derivativeTimeSum - pid.derivativeTimeValues.Dequeue();

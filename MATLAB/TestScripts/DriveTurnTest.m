@@ -3,7 +3,7 @@ brick = ConnectBrick('GROUP6');
 driveTrain = DriveTrain(brick, 'A', 'D');
 
 for i = 1:4
-    driveTrain.SetForwardVelocity(20); % Set foward velocity to 20cm/s
+    driveTrain.SetForwardVelocity(20); % Set forward velocity to 20cm/s
     updateCount = 20;
     
     for j = 1:updateCount

@@ -1,5 +1,5 @@
 classdef DriveTrain < handle
-    % The DriveTrain controls the two motors of a vehicle to perform complex manuvers
+    % The DriveTrain controls the two motors of a vehicle to perform complex manuevers
     
     properties (Constant, Access = protected)
         WHEEL_RADIUS double = 1.5              % The radius of both wheels in cm
@@ -17,7 +17,7 @@ classdef DriveTrain < handle
 
 
     methods (Access = private)
-        function angularVel = VelocityToAngluarVelocity(driveTrain, velocity)
+        function angularVel = VelocityToAngularVelocity(driveTrain, velocity)
             % Converts a velocity to an angular velocity
             arguments (Input)
                 driveTrain DriveTrain % The DriveTrain Object
@@ -77,7 +77,7 @@ classdef DriveTrain < handle
                 driveTrain DriveTrain % The DriveTrain Object
                 targetVelocity double % The new forward velocity in cm/s
             end
-            targetAVal = driveTrain.VelocityToAngluarVelocity(targetVelocity);
+            targetAVal = driveTrain.VelocityToAngularVelocity(targetVelocity);
             driveTrain.leftMotor.SetVelocityTarget(targetAVal * driveTrain.LEFT_VELOCITY_MULTIPLIER);
             driveTrain.rightMotor.SetVelocityTarget(targetAVal * driveTrain.RIGHT_VELOCITY_MULTIPLIER);
         end
@@ -100,8 +100,8 @@ classdef DriveTrain < handle
             end
 
             % Calculate target velocities
-            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
-            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
+            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
+            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
         
             % Set target velocities
             driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.LEFT_VELOCITY_MULTIPLIER);
