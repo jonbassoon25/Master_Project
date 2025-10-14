@@ -16,17 +16,19 @@ classdef ManualController < handle
 
     methods (Access = public)
         function controller = ManualController(keyboard, driveTrain)
-            % Constructor
-            arguments
+            % Initializes the properties of a new ManualController object
+            arguments (Input)
                 keyboard Keyboard     % The Keyboard to detect user input from
                 driveTrain DriveTrain % The DriveTrain to send control output to
             end
-
-            % Initialize class properties
+            arguments (Output)
+                controller ManualController % The constructed ManualController object
+            end
+ 
             controller.keyboard = keyboard;
             controller.driveTrain = driveTrain;
             controller.targetForwardVelocity = 0.0;
-            controller.targetAngularVelocity = 0.0; % Counter clockwise
+            controller.targetAngularVelocity = 0.0;
         end
 
         function Reset(controller)
@@ -39,7 +41,6 @@ classdef ManualController < handle
             controller.targetAngularVelocity = 0.0;
             controller.driveTrain.Stop();
         end
-
        
         function Update(controller)
             % Updates the control output to the DriveTrain based on keyboard input
