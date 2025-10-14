@@ -1,7 +1,12 @@
 classdef Keyboard < handle
     % A keyboard user input interface
+    
+    properties (Constant, Access=private)
+        DEBUG logical = false % Display debug information at runtime
+    end
+
     properties (Access = protected)
-        keysDown
+        keysDown LinkedList
         inputWindow
     end
 
@@ -10,16 +15,22 @@ classdef Keyboard < handle
             try
                 if (~keyboard.keysDown.Contains(key))
                     keyboard.keysDown.Append(key);
-                    fprintf("Press %s, list length: %d\n", key, keyboard.keysDown.length);
+                    %fprintf("%s\n", keyboard.keysDown.Get(keyboard.keysDown.length - 1));
+                    if (keyboard.DEBUG) 
+                        fprintf("Press %s, list length: %d\n", key, keyboard.keysDown.length);
+                    end
                 end
             catch exception
+                keyboard.keysDown.Clear();
             end
         end
 
         function ReleaseKey(keyboard, key)
             try
                 keyboard.keysDown.Remove(key);
-                fprintf("Release %s\n", key, keyboard.keysDown.length);
+                if (keyboard.DEBUG) 
+                    fprintf("Release %s, list length: %d\n", key, keyboard.keysDown.length);
+                end
             catch exception
                 keyboard.keysDown.Clear();
             end

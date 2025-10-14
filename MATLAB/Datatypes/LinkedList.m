@@ -100,9 +100,11 @@ classdef LinkedList < handle
             newNode = LinkedListElement(value);
             if (isempty(list.head))
                 list.head = newNode;
+                list.tail = newNode;
+            else
+                list.tail.next = newNode;
+                list.tail = list.tail.next;
             end
-            list.tail.next = newNode;
-            list.tail = list.tail.next;
             list.length = list.length + 1;
         end
 
@@ -129,8 +131,10 @@ classdef LinkedList < handle
                 list.head = newHead;
             else
                 curNode = list.head;
-                for i = 0:index - 2
+                i = 0;
+                while i + 1 < index
                     curNode = curNode.next;
+                    i = i + 1;
                 end
                 newNode = LinkedListElement(value);
                 newNode.next = curNode.next;
@@ -157,13 +161,12 @@ classdef LinkedList < handle
             end
             curNode = list.head;
             bool = false;
-            for i = 0:list.length - 1
+            while ~isempty(curNode)
                 if (curNode.value == value)
                     bool = true;
                     break;
-                else
-                    curNode = curNode.next;
                 end
+                curNode = curNode.next;
             end
         end
 
@@ -173,10 +176,9 @@ classdef LinkedList < handle
                 list LinkedList % This LinkedList Object
                 value           % The value to remove
             end
-
             % While the head of the linked list has a value equal to the
             % provided value
-            while (~isempty(list.head) && list.head.value == value)
+            while (~isempty(list.head) && (list.head.value == value))
                 list.head = list.head.next;
                 list.length = list.length - 1;
                 if (list.length == 0)
@@ -189,10 +191,12 @@ classdef LinkedList < handle
             %    that isn't the value to remove if the tail has a value
             while (~isempty(list.tail) && list.tail.value == value)
                 curNode = list.head;
-                for i = 0:list.length - 2
+                while ~isempty(curNode.next.next)
                     curNode = curNode.next;
                 end
+                curNode.next = [];
                 list.tail = curNode;
+                list.length = list.length - 1;
             end
             % Remove all elements with a value equal to the value to remove
             curNode = list.head;
