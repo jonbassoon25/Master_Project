@@ -4,8 +4,8 @@ driveTrain = DriveTrain(brick, "A", "D");
 keyboard = Keyboard();
 manualController = ManualController(keyboard, driveTrain);
 
-
 state = 0; % 0 = Manual Control, 1 = Autonomous Control, 2 = End
+
 
 while state ~= 2
     switch (state)
@@ -22,7 +22,6 @@ while state ~= 2
             fprintf("Switched to Automatic Control\n");
             state = 0;
     end
-    
 end
 
 clear;
