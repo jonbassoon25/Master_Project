@@ -1,53 +1,62 @@
 classdef DriveTrain < handle
-    % The drivetrain of the vehicle
-    %   This controlls the two motors on the vechicle to
-    %   perform complex manuvers
+    % The DriveTrain controls the two motors of a vehicle to perform complex manuvers
+    
+    properties (Constant, Access = protected)
+        WHEEL_RADIUS double = 1.5              % The radius of both wheels in cm
+        TURNING_RADIUS double = 7.0            % Distance between the driveTrain's center and the points of contact of its wheels in cm
+        LEFT_VELOCITY_MULTIPLIER double = 1.0  % The velocity multiplier for the left wheel
+        RIGHT_VELOCITY_MULTIPLIER double = 1.0 % The velocity multiplier for the right wheel
+        TURNING_ERROR_THRESHOLD double = 2     % The turning error threshold in degrees
+    end
 
     properties (Access = protected)
-        % Hardware variable references
-        brick
-        leftMotor
-        rightMotor
-        wheelRadius
-        turningRadius % Distance between the points of contact of the 2 turning wheels
-        leftVelocityMultiplier
-        rightVelocityMultiplier
-        turningError
-        
+        brick Brick      % The EV3 brick that the DriveTrain motors are connected to
+        leftMotor Motor  % The Left Motor
+        rightMotor Motor % The Right Motor
     end
 
 
     methods (Access = private)
         function angularVel = VelocityToAngluarVelocity(driveTrain, velocity)
-            % Converts a velocity in cm/sec to an angular velocity in
-            %   degrees per second
-            angularVel = 180/pi * (velocity / driveTrain.wheelRadius);
+            % Converts a velocity to an angular velocity
+            arguments (Input)
+                driveTrain DriveTrain % The DriveTrain Object
+                velocity double       % The velocity to convert in cm/s
+            end
+            arguments (Output)
+                angularVel double % The converted angular velocity in deg/sec
+            end
+            angularVel = 180/pi * (velocity / driveTrain.WHEEL_RADIUS);
         end
     end
 
-
     methods (Access = public)
         function driveTrain = DriveTrain(brick, leftMotorPort, rightMotorPort)
-            %Construct an instance of this class
-
-            % Set hardware variables
+            % Initializes the properties of a new DriveTrain object
+            arguments (Input)
+                brick Brick % The EV3 brick that the DriveTrain motors are connected to
+                leftMotorPort string  % The motor port letter of the left wheel's motor
+                rightMotorPort string % The motor port letter of the right wheel's motor
+            end
+            arguments (Output)
+                driveTrain DriveTrain % The constructed DriveTrain object
+            end
             driveTrain.brick = brick;
             driveTrain.leftMotor = Motor(brick, leftMotorPort);
             driveTrain.rightMotor = Motor(brick, rightMotorPort);
-
-            driveTrain.wheelRadius = (3.0) / 2; % find actual value
-            driveTrain.leftVelocityMultiplier = 1.0; % find actual value
-            driveTrain.rightVelocityMultiplier = 1.0; % find actual value
-            driveTrain.turningRadius = (14.0) / 2; % find actual value
-            driveTrain.turningError = 2; % find actual value
         end
 
         function TurnLeft(driveTrain, degreesCounterClockwise)
             % Turns Left in place by the specified number of degrees
-            driveTrain.leftMotor.SetRelAngleTarget(degreesCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius));
-            driveTrain.rightMotor.SetRelAngleTarget(-degreesCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius));
-            % Managing Angles 
-            while (abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle()) >= driveTrain.turningError || abs(driveTrain.rightMotor.GetCurrentAngleTarget() - driveTrain.rightMotor.GetCurrentAngle()) >= driveTrain.turningError) 
+            arguments (Input)
+                driveTrain DriveTrain          % The DriveTrain Object
+                degreesCounterClockwise double % The number of degrees counter clockwise (left) to turn
+            end
+            driveTrain.leftMotor.SetRelAngleTarget(degreesCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS));
+            driveTrain.rightMotor.SetRelAngleTarget(-degreesCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS));
+            
+            % Manage wheel angles until the error threshold is met
+            while (abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle()) >= driveTrain.TURNING_ERROR_THRESHOLD || abs(driveTrain.rightMotor.GetCurrentAngleTarget() - driveTrain.rightMotor.GetCurrentAngle()) >= driveTrain.TURNING_ERROR_THRESHOLD) 
                 driveTrain.leftMotor.ManageSetTargets();
                 driveTrain.leftMotor.ManageSetTargets();
             end
@@ -55,42 +64,65 @@ classdef DriveTrain < handle
 
         function TurnRight(driveTrain, degreesClockwise)
             % Turns Right in place by the specified number of degrees
+            arguments (Input)
+                driveTrain DriveTrain   % The DriveTrain Object
+                degreesClockwise double % The number of degrees clockwise (right) to turn
+            end
             driveTrain.TurnLeft(-degreesClockwise);
         end
 
         function SetForwardVelocity(driveTrain, targetVelocity)
-            % Sets this drivetrain's forward target velocity in cm/s
+            % Sets the forward target velocity
+            arguments (Input)
+                driveTrain DriveTrain % The DriveTrain Object
+                targetVelocity double % The new forward velocity in cm/s
+            end
             targetAVal = driveTrain.VelocityToAngluarVelocity(targetVelocity);
-            driveTrain.leftMotor.SetVelocityTarget(targetAVal * driveTrain.leftVelocityMultiplier);
-            driveTrain.rightMotor.SetVelocityTarget(targetAVal * driveTrain.rightVelocityMultiplier);
+            driveTrain.leftMotor.SetVelocityTarget(targetAVal * driveTrain.LEFT_VELOCITY_MULTIPLIER);
+            driveTrain.rightMotor.SetVelocityTarget(targetAVal * driveTrain.RIGHT_VELOCITY_MULTIPLIER);
         end
 
         function SetBackwardVelocity(driveTrain, targetVelocity)
-            % Sets this drivetrain's backward target velocity in cm/s
+            % Sets the backward target velocity
+            arguments (Input)
+                driveTrain DriveTrain % The DriveTrain Object
+                targetVelocity double % The new backward velocity in cm/s
+            end
             driveTrain.SetForwardVelocity(-targetVelocity);
         end
 
         function SetMixedMovementTargets(driveTrain, forwardVelocity, angularVelocityCounterClockwise)
             % Sets mixed movement target velocities in cm/s
-            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius);
-            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.turningRadius / driveTrain.wheelRadius);
+            arguments (Input)
+                driveTrain DriveTrain                  % This DriveTrain Object
+                forwardVelocity double                 % The new forward velocity in cm/s
+                angularVelocityCounterClockwise double % The new angular velocity counter clockwise (left) in deg/s
+            end
+
+            % Calculate target velocities
+            leftMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) + angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
+            rightMotorTargetAngularVelocity = driveTrain.VelocityToAngluarVelocity(forwardVelocity) - angularVelocityCounterClockwise * (driveTrain.TURNING_RADIUS / driveTrain.WHEEL_RADIUS);
         
-            driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.leftVelocityMultiplier);
-            driveTrain.rightMotor.SetVelocityTarget(rightMotorTargetAngularVelocity * driveTrain.rightVelocityMultiplier);
+            % Set target velocities
+            driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.LEFT_VELOCITY_MULTIPLIER);
+            driveTrain.rightMotor.SetVelocityTarget(rightMotorTargetAngularVelocity * driveTrain.RIGHT_VELOCITY_MULTIPLIER);
         end
 
         function ManageVelocityTargets(driveTrain)
-            % Manages the forward velocity to match the set target
+            % Manages the motor velocities to match their set targets
+            arguments (Input)
+                driveTrain DriveTrain % This DriveTrain Object
+            end
             driveTrain.leftMotor.ManageSetTargets();
             driveTrain.rightMotor.ManageSetTargets();
         end
 
         function Stop(driveTrain, brake)
+            % Stops both wheel motors
             arguments
                 driveTrain DriveTrain
                 brake string = "coast"
             end
-            % Stops both driveTrain motors
             driveTrain.leftMotor.Stop(brake);
             driveTrain.rightMotor.Stop(brake);
         end
