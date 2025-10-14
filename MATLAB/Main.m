@@ -4,7 +4,12 @@ driveTrain = DriveTrain(brick, "A", "D");
 keyboard = Keyboard();
 manualController = ManualController(keyboard, driveTrain);
 
-state = 0; % 0 = Manual Control, 1 = Autonomous Control, 2 = End
+
+% State Encodings
+%   0 = Manual Control
+%   1 = Autonomous Control
+%   2 = End
+state = 0; % Initial State
 
 
 while state ~= 2
@@ -16,12 +21,18 @@ while state ~= 2
             if (keyboard.IsPressed("esc"))
                 state = 2;
             elseif (keyboard.IsPressed("r"))
+                manualController.Reset();
                 state = 1;
             end
+
         case 1    % Autonomous Control Loop
             fprintf("Switched to Automatic Control\n");
+            state = 0;
+
+        otherwise % Invalid State
+            fprintf("Invalid State Encoding: %d. Defaulting to Manual Control.", state);
             state = 0;
     end
 end
 
-clear;
+clear; % Destroy all objects stored in the workspace

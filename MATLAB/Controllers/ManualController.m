@@ -27,6 +27,7 @@ classdef ManualController < handle
         function Reset(controller)
             controller.targetForwardVelocity = 0.0;
             controller.targetAngularVelocity = 0.0;
+            controller.driveTrain.Stop();
         end
 
         function Update(controller)
