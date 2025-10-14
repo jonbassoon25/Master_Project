@@ -1,36 +1,33 @@
-% Reference: 
-%   https://developer.wildernesslabs.co/Hardware/Reference/Algorithms/Proportional_Integral_Derivative/Standard_PID_Algorithm/
-
 classdef PID < handle
-    % A Universal PID Controller
+    % A Proportional Integral Derivative Controller using the standard form of the PID algorithm
 
     properties (Access = protected)
-        % Error tracker values
-        integralErrorValues
-        integralTimeValues
-        derivativeErrorValues
-        derivativeTimeValues
-        
-        integralErrorSum
-        integralTimeSum
-        derivativeErrorSum
-        derivativeTimeSum
-
-        proportionalErrorValue
-        lastPEV
-
-        % Proportional Gain
-        pGain
-
-        % Time cutoffs
-        targetIntegralTime
-        targetDerivativeTime
+        integralErrorValues Queue     % A queue of the last n integral error values
+        integralTimeValues Queue      % A queue of the measurement times of the recorded integral error values
+        derivativeErrorValues Queue   % A queue of the last n derivative error values
+        derivativeTimeValues Queue    % A queue of the measurement times of the recorded derivative error values
+        integralErrorSum double       % The sum of the recorded integral error values
+        integralTimeSum double        % The sum of the recorded integral measurement times
+        derivativeErrorSum double     % The sum of the recorded derivative error values
+        derivativeTimeSum double      % The sum of the recorded derivative measurment times
+        proportionalErrorValue double % The current proportional error value
+        lastPEV double                % The last proportional error value
+        pGain double                  % The proportional gain constant
+        targetIntegralTime double     % The ideal sum of the recorded integral times
+        targetDerivativeTime double   % The ideal sum of the recorded derivative times
     end
-
 
     methods
         function pid = PID(pGain, integralTime, derivativeTime)
-            % Construct an instance of this class
+            % Initializes the properties of a new PID object
+            arguments (Input)
+                pGain double          % The proportional gain constant to use
+                integralTime double   % The target integral time to use
+                derivativeTime double % The target derivative time to use
+            end
+            arguments (Output)
+                pid PID % The constructed PID object
+            end
             pid.pGain = pGain;
             pid.targetIntegralTime = integralTime;
             pid.targetDerivativeTime = derivativeTime;
@@ -39,7 +36,10 @@ classdef PID < handle
         end
 
         function reset(pid)
-            % Resets this PID to its default state
+            % Resets the properties of this PID to their default values
+            arguments (Input)
+                pid PID % The PID object
+            end
             pid.integralErrorValues = Queue();
             pid.integralTimeValues = Queue();
             pid.derivativeErrorValues = Queue();
@@ -54,11 +54,12 @@ classdef PID < handle
         end
 
         function updateErrorState(pid, error, ellapsedTime)
-            % Update the error state of this PID with a
-            %   new Integral Error Value
-            %   new Proportional Error Value
-            %   new Derivative Error Value
-
+            % Update the error state of the PID controller
+            arguments (Input)
+                pid PID             % The PID object
+                error double        % The current error of the control variable
+                ellapsedTime double % The time since the last measurement
+            end
             % Update proportional error value
             lastError = pid.proportionalErrorValue;
             pid.proportionalErrorValue = error;
@@ -88,8 +89,14 @@ classdef PID < handle
         end
 
         function controlOutput = calculateControlOutput(pid)
-            % Calculates the control output of this PID in the range
-            %   -1:1 inclusive
+            % Calculates the control output of this PID
+            arguments (Input)
+                pid PID % The PID object
+            end
+            arguments (Output)
+                controlOutput double % The control output in the range [-1, 1]
+            end
+            
             proportionalError = pid.proportionalErrorValue;
 
             if (pid.targetIntegralTime ~= 0)
