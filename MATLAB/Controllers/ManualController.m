@@ -1,5 +1,10 @@
 classdef ManualController < handle
     % Controls the provided DriveTrain given keyboard input
+
+    properties (Constant, Access=private)
+        DEBUG logical = false % Display debug information at runtime
+    end
+
     properties (Access = protected, Constant)
         FORWARD_ACCELERATION double = 1.0; % The forward acceleration constant in cm/s²
         ANGULAR_ACCELERATION double = 1.0; % The angular acceleration constant in deg/s² counter clockwise
@@ -53,7 +58,6 @@ classdef ManualController < handle
             leftInput = isPressed("a");
             rightInput = isPressed("d");
             
-            
             if (fowardInput) % Forward Input
                 controller.targetForwardVelocity = controller.targetForwardVelocity + controller.FORWARD_ACCELERATION;
             end
@@ -74,6 +78,11 @@ classdef ManualController < handle
             % No Left or Right Input
             if (~(leftInput || rightInput))
                 controller.targetAngularVelocity = 0;
+            end
+
+            if (controller.DEBUG)
+                fprintf("Control Input:\n\tForward: %d\n\tBackward: %d\n\tLeft: %d\n\tRight: %d", fowardInput, backwardInput, leftInput, rightInput);
+                fprintf("Control Output:\n\tFoward Velocity: %.2f\n\tAngular Velocity: %.2f", controller.targetForwardVelocity, controller.targetAngularVelocity);
             end
    
             % Set & Manage DriveTrain Movement Targets
