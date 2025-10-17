@@ -10,7 +10,7 @@ classdef Queue < handle
         length uint32 % The length of the queue
     end
 
-    methods
+    methods (Access = public)
         function queue = Queue()
             % Initializes the properties of a new Queue object
             arguments (Output)

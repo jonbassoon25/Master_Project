@@ -81,11 +81,11 @@ classdef Motor < handle
 
             if (motor.movementMode == 1)
                 % Update the angle PID
-                motor.ANGLE_PID.updateErrorState(motor.currentAngle - motor.angleTarget, deltaTime);
+                motor.ANGLE_PID.UpdateErrorState(motor.currentAngle - motor.angleTarget, deltaTime);
 
             elseif (motor.movementMode == 2)
                 % Update the velocity PID
-                motor.VELOCITY_PID.updateErrorState(motor.currentVelocity - motor.velocityTarget, deltaTime);
+                motor.VELOCITY_PID.UpdateErrorState(motor.currentVelocity - motor.velocityTarget, deltaTime);
             end
         end
 
@@ -100,11 +100,11 @@ classdef Motor < handle
 
             if (motor.movementMode == 1)
                 % Manage the motor angle
-                controlOutput = -motor.ANGLE_PID.calculateControlOutput();
+                controlOutput = -motor.ANGLE_PID.CalculateControlOutput();
                 
             elseif (motor.movementMode == 2)
                 % Manage the motor velocity 
-                controlOutput = -motor.VELOCITY_PID.calculateControlOutput();
+                controlOutput = -motor.VELOCITY_PID.CalculateControlOutput();
                 
             else
                 controlOutput = 0;
@@ -136,8 +136,8 @@ classdef Motor < handle
             motor.angleTarget = [];
             motor.velocityTarget = [];
             motor.movementMode = 0;
-            motor.ANGLE_PID.reset();
-            motor.VELOCITY_PID.reset();
+            motor.ANGLE_PID.Reset();
+            motor.VELOCITY_PID.Reset();
         end
 
         function SetAngleTarget(motor, target)

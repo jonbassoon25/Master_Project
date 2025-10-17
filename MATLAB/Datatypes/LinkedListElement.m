@@ -6,7 +6,7 @@ classdef LinkedListElement < handle
         next % The next LinkedListElement or [] if there is none
     end
 
-    methods
+    methods (Access = public)
         function element = LinkedListElement(value)
             % Initializes the properties of a new LinkedListElement object
             arguments (Input)

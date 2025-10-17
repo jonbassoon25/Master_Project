@@ -21,7 +21,7 @@ classdef PID < handle
         targetDerivativeTime double   % The ideal sum of the recorded derivative times
     end
 
-    methods
+    methods (Access = public)
         function pid = PID(pGain, integralTime, derivativeTime)
             % Initializes the properties of a new PID object
             arguments (Input)
@@ -36,10 +36,10 @@ classdef PID < handle
             pid.targetIntegralTime = integralTime;
             pid.targetDerivativeTime = derivativeTime;
 
-            pid.reset();
+            pid.Reset();
         end
 
-        function reset(pid)
+        function Reset(pid)
             % Resets the properties of this PID to their default values
             arguments (Input)
                 pid PID % The PID object
@@ -57,7 +57,7 @@ classdef PID < handle
             pid.proportionalErrorValue = 0;
         end
 
-        function updateErrorState(pid, error, elapsedTime)
+        function UpdateErrorState(pid, error, elapsedTime)
             % Update the error state of the PID controller
             arguments (Input)
                 pid PID             % The PID object
@@ -92,7 +92,7 @@ classdef PID < handle
             end
         end
 
-        function controlOutput = calculateControlOutput(pid)
+        function controlOutput = CalculateControlOutput(pid)
             % Calculates the control output of this PID
             arguments (Input)
                 pid PID % The PID object
