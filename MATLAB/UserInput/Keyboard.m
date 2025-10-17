@@ -10,26 +10,6 @@ classdef Keyboard < handle
         inputWindow % The input window for key presses
     end
 
-    methods (Access = public)
-        function keyboard = Keyboard()
-            % Initializes the properties of a new Keyboard object
-            arguments (Output)
-                keyboard Keyboard % The constructed Keyboard object
-            end
-            keyboard.keysDown = LinkedList();
-            keyboard.inputWindow = figure;
-
-            % Setup keyboard event callbacks
-            set(keyboard.inputWindow, 'KeyPressFcn', @(h_obj, evt) keyboard.PressKey(evt.Key));
-            set(keyboard.inputWindow, 'KeyReleaseFcn', @(h_obj, evt) keyboard.ReleaseKey(evt.Key));
-
-            % Create text
-            text(1) = {'Click on this window and press any key to control the robot.'};
-            textbox = annotation(keyboard.inputWindow, 'textbox',[0,0,1,1]);
-            set(textbox,'String', text);
-        end
-    end
-
     methods (Access = protected)
         function PressKey(keyboard, key)
             % Called when a key press needs to be recorded
@@ -67,6 +47,24 @@ classdef Keyboard < handle
     end
 
     methods (Access = public)
+        function keyboard = Keyboard()
+            % Initializes the properties of a new Keyboard object
+            arguments (Output)
+                keyboard Keyboard % The constructed Keyboard object
+            end
+            keyboard.keysDown = LinkedList();
+            keyboard.inputWindow = figure;
+
+            % Setup keyboard event callbacks
+            set(keyboard.inputWindow, 'KeyPressFcn', @(h_obj, evt) keyboard.PressKey(evt.Key));
+            set(keyboard.inputWindow, 'KeyReleaseFcn', @(h_obj, evt) keyboard.ReleaseKey(evt.Key));
+
+            % Create text
+            text(1) = {'Click on this window and press any key to control the robot.'};
+            textbox = annotation(keyboard.inputWindow, 'textbox',[0,0,1,1]);
+            set(textbox,'String', text);
+        end
+        
         function bool = IsPressed(keyboard, key)
             % Determines if a keyboard key is currently being pressed
             arguments (Input)
