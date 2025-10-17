@@ -1,6 +1,6 @@
 % Initialize Objects
 brick = ConnectBrick('GROUP6');
-driveTrain = DriveTrain(brick, "A", "D");
+driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
 manualController = ManualController(keyboard, driveTrain);
 
@@ -13,12 +13,14 @@ state = 0; % Initial State
 
 
 while state ~= 2
+    pause(0.05); % Allow keyboard to take input
+
     switch (state)
         case 0    % Manual Control Loop
             manualController.Update()
 
             % Manage User Input
-            if (keyboard.IsPressed("esc"))
+            if (keyboard.IsPressed("q"))
                 state = 2;
             elseif (keyboard.IsPressed("r"))
                 manualController.Reset();

@@ -2,15 +2,15 @@ classdef DriveTrain < handle
     % The DriveTrain controls the two motors of a vehicle to perform complex manuevers
     
     properties (Constant, Access=private)
-        DEBUG logical = false % Display debug information at runtime
+        DEBUG logical = true % Display debug information at runtime
     end
 
     properties (Constant, Access = protected)
-        WHEEL_RADIUS double = 1.5              % The radius of both wheels in cm
-        TURNING_RADIUS double = 7.0            % Distance between the driveTrain's center and the points of contact of its wheels in cm
-        LEFT_VELOCITY_MULTIPLIER double = 1.0  % The velocity multiplier for the left wheel
-        RIGHT_VELOCITY_MULTIPLIER double = 1.0 % The velocity multiplier for the right wheel
-        TURNING_ERROR_THRESHOLD double = 2     % The turning error threshold in degrees
+        WHEEL_RADIUS double = (6.72 / 2)         % The radius of both wheels in cm
+        TURNING_RADIUS double = (20.6 - 3.9) / 2 % Distance between the driveTrain's center and the points of contact of its wheels in cm
+        LEFT_VELOCITY_MULTIPLIER double = 1.0    % The velocity multiplier for the left wheel
+        RIGHT_VELOCITY_MULTIPLIER double = 1.0   % The velocity multiplier for the right wheel
+        TURNING_ERROR_THRESHOLD double = 12.0    % The turning error threshold in degrees
     end
 
     properties (Access = protected)
@@ -52,8 +52,8 @@ classdef DriveTrain < handle
             % Initializes the properties of a new DriveTrain object
             arguments (Input)
                 brick Brick % The EV3 brick that the DriveTrain motors are connected to
-                leftMotorPort string  % The motor port letter of the left wheel's motor
-                rightMotorPort string % The motor port letter of the right wheel's motor
+                leftMotorPort char  % The motor port letter of the left wheel's motor
+                rightMotorPort char % The motor port letter of the right wheel's motor
             end
             arguments (Output)
                 driveTrain DriveTrain % The constructed DriveTrain object
@@ -87,7 +87,7 @@ classdef DriveTrain < handle
 
                 % Manage wheel angles
                 driveTrain.leftMotor.ManageSetTargets();
-                driveTrain.leftMotor.ManageSetTargets();
+                driveTrain.rightMotor.ManageSetTargets();
                 
                 % Recalculate error values
                 leftError = abs(driveTrain.leftMotor.GetCurrentAngleTarget() - driveTrain.leftMotor.GetCurrentAngle());
@@ -137,14 +137,16 @@ classdef DriveTrain < handle
                 angularVelocityCounterClockwise double % The new angular velocity counter clockwise (left) in deg/s
             end
 
-            if (driveTrain.DEBUG)
-                fprintf("Setting a mixed movement target of %.2f cm/s forward and %.2f deg/s counter clockwise\n", forwardVelocity, angularVelocityCounterClockwise);
-            end
 
             % Calculate target velocities
             leftMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) - driveTrain.DriveTrainRotationsToWheelRotations(angularVelocityCounterClockwise);
             rightMotorTargetAngularVelocity = driveTrain.VelocityToAngularVelocity(forwardVelocity) + driveTrain.DriveTrainRotationsToWheelRotations(angularVelocityCounterClockwise);
         
+            if (driveTrain.DEBUG)
+                fprintf("Setting a mixed movement target of %.2f cm/s forward and %.2f deg/s counter clockwise\n", forwardVelocity, angularVelocityCounterClockwise);
+                fprintf("Calculated motor velocities A: %.2f deg/s and D: %.2f deg/s\n", leftMotorTargetAngularVelocity, rightMotorTargetAngularVelocity);
+            end
+
             % Set target velocities
             driveTrain.leftMotor.SetVelocityTarget(leftMotorTargetAngularVelocity * driveTrain.LEFT_VELOCITY_MULTIPLIER);
             driveTrain.rightMotor.SetVelocityTarget(rightMotorTargetAngularVelocity * driveTrain.RIGHT_VELOCITY_MULTIPLIER);

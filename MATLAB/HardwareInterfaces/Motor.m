@@ -6,13 +6,13 @@ classdef Motor < handle
     end
 
     properties (Constant, Access = protected)
-        ANGLE_PID PID = PID(0.00062, 16, 0.021);      % The angle PID controller for this motor
-        VELOCITY_PID PID = PID(0.00031, 80, 0.01325); % The velocity PID controller for this motor
+        ANGLE_PID PID = PID(0.0016, 16, 0.018);      % The angle PID controller for this motor
+        VELOCITY_PID PID = PID(0.00031, 40, 0.01325); % The velocity PID controller for this motor
     end
 
     properties (Access = protected)
         brick Brick                % The EV3 brick that this motor is connected to
-        port string                % The motor port letter that this motor is connected to
+        port char                  % The motor port letter that this motor is connected to
         currentAngle double        % The current angle of this motor in degrees
         currentVelocity double     % The current velocity of this motor in deg/sec
         currentAcceleration double % The current acceleration of this motor in deg/sec²
@@ -160,7 +160,7 @@ classdef Motor < handle
             end
             motor.ClearTargets();
             motor.UpdateData();
-            motor.angleTarget = relTarget + motor.currentAngle;
+            motor.angleTarget = -relTarget + motor.currentAngle;
             motor.movementMode = 1;
         end
 

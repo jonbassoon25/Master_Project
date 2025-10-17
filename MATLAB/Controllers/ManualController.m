@@ -2,12 +2,14 @@ classdef ManualController < handle
     % Controls the provided DriveTrain given keyboard input
 
     properties (Constant, Access=private)
-        DEBUG logical = false % Display debug information at runtime
+        DEBUG logical = true % Display debug information at runtime
     end
 
     properties (Access = protected, Constant)
-        FORWARD_ACCELERATION double = 1.0; % The forward acceleration constant in cm/s²
-        ANGULAR_ACCELERATION double = 1.0; % The angular acceleration constant in deg/s² counter clockwise
+        FORWARD_ACCELERATION double = 36.0 % The forward acceleration constant in cm/s²
+        ANGULAR_ACCELERATION double = 120.0 % The angular acceleration constant in deg/s² counter clockwise
+        MAX_MOTOR_VELOCITY double = 180    % The maximum foward velocity magnitude in cm/s
+        MAX_TURNING_RATE double = 720    % The maximum turning rate magnitude in deg/s
     end
 
 
@@ -53,10 +55,10 @@ classdef ManualController < handle
                 controller ManualController % This ManualController Object
             end
 
-            fowardInput = isPressed("w");
-            backwardInput = isPressed("s");
-            leftInput = isPressed("a");
-            rightInput = isPressed("d");
+            fowardInput = controller.keyboard.IsPressed("w");
+            backwardInput = controller.keyboard.IsPressed("s");
+            leftInput = controller.keyboard.IsPressed("a");
+            rightInput = controller.keyboard.IsPressed("d");
             
             if (fowardInput) % Forward Input
                 controller.targetForwardVelocity = controller.targetForwardVelocity + controller.FORWARD_ACCELERATION;
@@ -81,8 +83,22 @@ classdef ManualController < handle
             end
 
             if (controller.DEBUG)
-                fprintf("Control Input:\n\tForward: %d\n\tBackward: %d\n\tLeft: %d\n\tRight: %d", fowardInput, backwardInput, leftInput, rightInput);
-                fprintf("Control Output:\n\tFoward Velocity: %.2f\n\tAngular Velocity: %.2f", controller.targetForwardVelocity, controller.targetAngularVelocity);
+                fprintf("Control Input:\n\tForward: %d\n\tBackward: %d\n\tLeft: %d\n\tRight: %d\n", fowardInput, backwardInput, leftInput, rightInput);
+                fprintf("Control Output:\n\tFoward Velocity: %.2f\n\tAngular Velocity: %.2f\n", controller.targetForwardVelocity, controller.targetAngularVelocity);
+            end
+
+            % Make sure target forward velocity and target angular velocity
+            % are bounded
+            if (controller.targetForwardVelocity > controller.MAX_MOTOR_VELOCITY)
+                controller.targetForwardVelocity = controller.MAX_MOTOR_VELOCITY;
+            elseif (controller.targetForwardVelocity < -controller.MAX_MOTOR_VELOCITY)
+                controller.targetForwardVelocity = -controller.MAX_MOTOR_VELOCITY;
+            end
+
+            if (controller.targetAngularVelocity > controller.MAX_TURNING_RATE)
+                controller.targetAngularVelocity = controller.MAX_TURNING_RATE;
+            elseif (controller.targetAngularVelocity < -controller.MAX_TURNING_RATE)
+                controller.targetAngularVelocity = -controller.MAX_TURNING_RATE;
             end
    
             % Set & Manage DriveTrain Movement Targets
