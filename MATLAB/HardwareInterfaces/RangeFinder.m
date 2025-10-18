@@ -1,24 +1,29 @@
-classdef RangeFinder
+classdef RangeFinder < handle
     % Controls the RangeFinder of the vehicle
 
-    properties (Access = public)
+    properties (Access = protected)
         motor Motor
         ultraSensor UltrasonicSensor
         targetMotorVelocity double
-          
+
+        lastScan RangeScan % The last complete scan
+        nextScan RangeScan % The scan that is currently being built
     end
 
-    methods
-        function obj = RangeFinder(inputArg1,inputArg2)
-            %RANGEFINDER Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
+    methods (Access = public)
+        function rangeFinder = RangeFinder(motor, ultrasonicSensor)
+            arguments (Input)
+                motor Motor
+                ultrasonicSensor UltrasonicSensor
+            end
+            arguments (Output)
+                rangeFinder RangeFinder
+            end
 
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+            rangeFinder.motor = motor;
+            rangeFinder.ultraSensor = ultrasonicSensor;
+            rangeFinder.lastScan = RangeScan();
+            rangeFinder.nextScan = RangeScan();
         end
     end
 end
