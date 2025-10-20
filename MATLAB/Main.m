@@ -2,7 +2,8 @@
 brick = ConnectBrick('GROUP6');
 driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
-manualController = ManualController(keyboard, driveTrain);
+arm = Motor(brick, 'C');
+manualController = ManualController(keyboard, driveTrain, arm);
 
 
 % State Encodings
@@ -22,7 +23,7 @@ while state ~= 2
             % Manage User Input
             if (keyboard.IsPressed("q"))
                 state = 2;
-            elseif (keyboard.IsPressed("r"))
+            elseif (keyboard.IsPressed("v"))
                 manualController.Reset();
                 state = 1;
             end
