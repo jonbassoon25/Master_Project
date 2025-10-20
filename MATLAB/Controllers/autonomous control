@@ -1,0 +1,32 @@
+% Create a Simulink model with an Ultrasonic Sensor block
+model = 'myUltrasonicModel';
+open_system(model);
+
+% Configure the Ultrasonic Sensor block
+set_param([model '/Ultrasonic Sensor'], 'TriggerPin', '4', 'EchoPin', '5');
+
+% Main loop for checking directions
+while true
+    % Read distance from the ultrasonic sensor
+    distanceFront = get_param([model '/Ultrasonic Sensor'], 'OutputPort1');
+
+    % Check for walls
+    if distanceFront < threshold % Define a threshold for wall detection
+        % Check right
+        distanceRight = checkRight(); % Implement checkRight function
+        if distanceRight < threshold
+            % Check left
+            distanceLeft = checkLeft(); % Implement checkLeft function
+            if distanceLeft >= threshold
+                moveLeft(); % Implement moveLeft function
+            else
+                break; % No valid moves
+            end
+        else
+            moveRight(); % Implement moveRight function
+        end
+    else
+        moveForward(); % Implement moveForward function
+    end
+
+    pause(0.1); % Delay for sensor reading
