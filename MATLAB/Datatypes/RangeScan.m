@@ -1,6 +1,5 @@
 classdef RangeScan < handle
-    %RANGESCAN Summary of this class goes here
-    %   Detailed explanation goes here
+    % A dataclass for storing range scan data
 
     properties (Access = protected)
         minima LinkedList      % The minima of the scan, sorted by ascending theta
