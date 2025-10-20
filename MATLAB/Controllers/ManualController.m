@@ -123,7 +123,7 @@ classdef ManualController < handle
             % Make sure target arm velocity is bounded
             if (controller.targetArmVelocity > controller.MAX_ARM_VELOCITY)
                 controller.targetArmVelocity = controller.MAX_ARM_VELOCITY;
-            elseif (controller.targetArmVelocity < controller.MAX_ARM_VELOCITY)
+            elseif (controller.targetArmVelocity < -controller.MAX_ARM_VELOCITY)
                 controller.targetArmVelocity = -controller.MAX_ARM_VELOCITY;
             end
    
