@@ -165,7 +165,7 @@ classdef DriveTrain < handle
             % Stops both wheel motors
             arguments
                 driveTrain DriveTrain
-                brake string = "coast"
+                brake = "coast"
             end
             driveTrain.leftMotor.Stop(brake);
             driveTrain.rightMotor.Stop(brake);

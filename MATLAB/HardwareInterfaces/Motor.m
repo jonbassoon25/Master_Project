@@ -121,7 +121,7 @@ classdef Motor < handle
             % Stops this motor
             arguments (Input)
                 motor Motor % This Motor object
-                brake string = "coast" % Should the motor break to stop
+                brake = "coast" % Should the motor break to stop
             end
             motor.ClearTargets();
             motor.brick.StopMotor(motor.port, brake);

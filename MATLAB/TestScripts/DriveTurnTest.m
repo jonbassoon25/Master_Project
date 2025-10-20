@@ -1,4 +1,4 @@
-brick = ConnectBrick('GROUP6');
+qbrick = ConnectBrick('GROUP6');
 
 driveTrain = DriveTrain(brick, 'A', 'D');
 
