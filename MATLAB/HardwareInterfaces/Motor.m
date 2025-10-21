@@ -6,7 +6,7 @@ classdef Motor < handle
     end
 
     properties (Constant, Access = protected)
-        ANGLE_PID PID = PID(0.0016, 16, 0.018);      % The angle PID controller for this motor
+        ANGLE_PID PID = PID(0.0016, 16, 0.018);       % The angle PID controller for this motor
         VELOCITY_PID PID = PID(0.00031, 40, 0.01325); % The velocity PID controller for this motor
     end
 
