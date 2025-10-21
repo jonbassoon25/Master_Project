@@ -16,7 +16,7 @@ classdef RangeFinder < handle
         ultraSensor UltrasonicSensor
         targetMotorVelocity double
 
-        lastScan RangeScan % The last complete scan
+        lastScan % The last complete scan or []
         nextScan RangeScan % The scan that is currently being built
 
         lastDistance double % The last recorded distance of the ultrasonic sensor
@@ -36,13 +36,14 @@ classdef RangeFinder < handle
 
             rangeFinder.motor = motor;
             rangeFinder.ultraSensor = ultrasonicSensor;
-            rangeFinder.lastScan = RangeScan();
-            rangeFinder.nextScan = RangeScan();
             
             rangeFinder.motor.UpdateData();
             rangeFinder.lastDistance = rangeFinder.ultraSensor.GetDistance();
             rangeFinder.lastTheta = rangeFinder.motor.GetCurrentAngle();
             rangeFinder.last_dDdT = 0.0;
+
+            rangeFinder.lastScan = rangeFinder.CompleteFullScan();
+            rangeFinder.nextScan = RangeScan();
         end
 
         function scan = CompleteFullScan(rangeFinder)
@@ -50,34 +51,38 @@ classdef RangeFinder < handle
             rangeFinder.lastScan = [];
 
             fprintf("Performing full scan...\n");
+            rangeFinder.motor.SetAngleTarget(-rangeFinder.SCAN_FOV);
+            rangeFinder.motor.SetVelocityTarget(rangeFinder.SCAN_SPEED);
             while (isempty(rangeFinder.lastScan))
                 rangeFinder.Update();
             end
             fprintf("Scan complete.\n");
+
+            rangeFinder.motor.Stop(0);
             
             scan = rangeFinder.lastScan();
         end
 
         function Update(rangeFinder)
-            rangeFinder.motor.ManageSetTargets();
+            rangeFinder.motor.UpdateData();
 
             theta = rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET;
             distance = rangeFinder.ultraSensor.GetDistance();
             velocity = [0, rangeFinder.motor.GetCurrentVelocity()];
 
             u = [cos(theta), sin(theta)];
-            correctedDistance = distance + (dot(velocity, u) * u);
+            correctedDistance = distance + (dot(velocity, u));
             
             dDistance_dTheta = (correctedDistance - rangeFinder.lastDistance) / (theta - rangeFinder.lastTheta);
             
-            if (dDistance_dTheta == 0 && rangeFinder.last_dDdT == 0)
+            if ((dDistance_dTheta == 0.0) && (rangeFinder.last_dDdT == 0.0))
                 % Cannot determine max or min
 
-            elseif (dDistance_dTheta <= 0 && rangeFinder.last_dDdT >= 0)
+            elseif ((dDistance_dTheta <= 0) && (rangeFinder.last_dDdT >= 0))
                 % There is a minimum distance to the measured surface
                 rangeFinder.nextScan.addMinima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
                 
-            elseif (dDistance_dTheta >= 0 && rangeFinder.last_dDdT <= 0)
+            elseif ((dDistance_dTheta >= 0) && (rangeFinder.last_dDdT <= 0))
                 % There is a maximum distance to the measured surface
                 rangeFinder.nextScan.addMaxima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
             end
@@ -96,6 +101,7 @@ classdef RangeFinder < handle
                 rangeFinder.lastScan = rangeFinder.nextScan;
                 rangeFinder.nextScan = RangeScan();
             end
+            rangeFinder.motor.ManageSetTargets();
         end
     end
 end

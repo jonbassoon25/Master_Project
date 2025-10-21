@@ -27,7 +27,7 @@ classdef Motor < handle
             % Initializes the properties of a new Motor object
             arguments (Input)
                 brick Brick % The EV3 brick that this motor is connected to
-                port string % The motor port letter that this motor is connected to
+                port char   % The motor port letter that this motor is connected to
             end
             arguments (Output)
                 motor Motor % The constructed Motor object
@@ -121,7 +121,7 @@ classdef Motor < handle
             % Stops this motor
             arguments (Input)
                 motor Motor % This Motor object
-                brake = "coast" % Should the motor break to stop
+                brake char = 'coast' % Should the motor break to stop
             end
             motor.ClearTargets();
             motor.brick.StopMotor(motor.port, brake);

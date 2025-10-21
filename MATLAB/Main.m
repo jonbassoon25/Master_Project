@@ -2,8 +2,13 @@
 brick = ConnectBrick('GROUP6');
 driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
+
 arm = Motor(brick, 'C');
 manualController = ManualController(keyboard, driveTrain, arm);
+
+rangeMotor = Motor(brick, 'B');
+rangeSensor = UltrasonicSensor(brick, 3);
+rangeFinder = RangeFinder(rangeMotor, rangeSensor);
 
 
 % State Encodings
