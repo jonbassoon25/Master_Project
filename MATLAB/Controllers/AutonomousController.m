@@ -19,16 +19,15 @@ classdef AutonomousController
     end
 
     methods (Access = protected)
-        function bool = ShouldTurnLeft(controller)
+        function bool = ShouldTurnLeft(controller) % TODO: Implement ShouldTurnLeft function
             bool = false;
         end
-        function bool = ShouldTurnRight(controller)
+        function bool = ShouldTurnRight(controller) % TODO: Implement ShouldTurnRight function
             bool = false;
         end
 
-        function MoveForward(controller)
+        function MoveForward(controller) % TODO: Implement MoveForward function
         end
-        
     end
 
     methods (Access = public)
