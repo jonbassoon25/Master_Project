@@ -8,6 +8,11 @@ classdef AutonomousController
     properties (Constant, Access = protected)
         MAZE_TILE_SIZE double = 12.0; % The size of the maze tiles in cm
         TARGET_BEARING_PID PID = PID(0.05, 80, 0.2); % The target bearing PID controller. Allows the vehicle to automatically correct its bearing.
+        FORWARD_ACCELERATION double = 36.0  % The forward acceleration constant in cm/s²
+        ANGULAR_ACCELERATION double = 120.0 % The angular acceleration constant in deg/s² counter clockwise
+        ARM_ACCELERATION double = 120.0     % The angular acceleration constnt in deg/s² counter clockwise
+        MAX_DRIVE_VELOCITY double = 180.0   % The maximum foward velocity magnitude in cm/s
+        MAX_TURNING_RATE double = 720.0     % The maximum turning rate magnitude in deg/s
     end
 
     properties (Access = protected)
