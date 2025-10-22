@@ -28,6 +28,8 @@ classdef AutonomousController
         end
 
         function MoveForward(controller) % TODO: Implement MoveForward function
+        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelociity);
+        controller.driveTrain.MangageVelocityTargets();
         end
     end
 
