@@ -57,7 +57,7 @@ classdef RangeFinder < handle
             
             % Rotate the scan motor to the correct position
             rangeFinder.motor.SetAngleTarget(-rangeFinder.SCAN_FOV / 2);
-            while (abs(rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET + rangeFinder.SCAN_FOV / 2) > 4)
+            while (abs(rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET + rangeFinder.SCAN_FOV / 2) > 12)
                 if (rangeFinder.DEBUG)
                     fprintf("Current range finder angle: %.2f degs. Rotating to: %.2f +/- 4 degs\n", rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET, rangeFinder.SCAN_FOV / 2);
                 end
