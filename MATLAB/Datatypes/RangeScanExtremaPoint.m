@@ -1,6 +1,5 @@
 classdef RangeScanExtremaPoint < handle
-    %RANGEEXTREMAPOINT Summary of this class goes here
-    %   Detailed explanation goes here
+    % An extrema point of a scan range's interval
 
     properties (Access = public)
         type string % Type of the extrema point (max, min or undefined)
