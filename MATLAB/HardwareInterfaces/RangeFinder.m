@@ -7,11 +7,12 @@ classdef RangeFinder < handle
 
     properties (Constant, Access = protected)
         SCAN_FOV double = 270   % Scan field of view in degrees
-        SCAN_SPEED double = 0.1 % Scan speed as a decimal of the motor power
+        SCAN_SPEED double = 0.08 % Scan speed as a decimal of the motor power
     end
 
     properties (Access = protected)
         motor Motor
+        driveTrain DriveTrain
         ultraSensor UltrasonicSensor
         targetMotorVelocity double
 
@@ -26,9 +27,10 @@ classdef RangeFinder < handle
     end
 
     methods (Access = public)
-        function rangeFinder = RangeFinder(motor, ultrasonicSensor)
+        function rangeFinder = RangeFinder(motor, driveTrain, ultrasonicSensor)
             arguments (Input)
                 motor Motor
+                driveTrain DriveTrain
                 ultrasonicSensor UltrasonicSensor
             end
             arguments (Output)
@@ -36,15 +38,28 @@ classdef RangeFinder < handle
             end
 
             rangeFinder.motor = motor;
+            rangeFinder.driveTrain = driveTrain;
             rangeFinder.ultraSensor = ultrasonicSensor;
             rangeFinder.lastScan = RangeScan();
             rangeFinder.nextScan = RangeScan();
             
             rangeFinder.motor.UpdateData();
-            rangeFinder.SCAN_OFFSET = fix(rangeFinder.motor.GetCurrentAngle() / 360) * 360;
+            rangeFinder.SCAN_OFFSET = rangeFinder.motor.GetCurrentAngle();
             rangeFinder.lastDistance = rangeFinder.ultraSensor.GetDistance();
             rangeFinder.lastTheta = rangeFinder.motor.GetCurrentAngle();
             rangeFinder.last_dDdT = 0.0;
+        end
+
+        function Start(rangeFinder)
+            rangeFinder.lastScan = RangeScan();
+            rangeFinder.nextScan = RangeScan();
+            rangeFinder.motor.SendOutputPower(rangeFinder.SCAN_SPEED);
+        end
+
+        function Stop(rangeFinder)
+            rangeFinder.lastScan = RangeScan();
+            rangeFinder.nextScan = RangeScan();
+            rangeFinder.motor.Stop(0);
         end
 
         function scan = CompleteFullScan(rangeFinder)
@@ -67,7 +82,7 @@ classdef RangeFinder < handle
             % Set the motor to the correct speed
             rangeFinder.motor.SendOutputPower(rangeFinder.SCAN_SPEED);
             if (rangeFinder.DEBUG)
-                fprintf("Setting range finder velocity target to %.2f deg/s\n", rangeFinder.SCAN_SPEED);
+                fprintf("Setting range finder rotation power to %.2f\n", rangeFinder.SCAN_SPEED);
             end
             samples = 0;
             while (rangeFinder.fullScanMode)
@@ -85,17 +100,16 @@ classdef RangeFinder < handle
 
         function Update(rangeFinder)
             rangeFinder.motor.UpdateData();
-            
+
             theta = pi/180 * (rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET);
             distance = rangeFinder.ultraSensor.GetDistance();
-            velocity = [0, rangeFinder.motor.GetCurrentVelocity()];
-
-            fprintf("Recorded distance: %.2fcm\nRecorded angle: %.2frad\n", distance, theta);
+            velocity = [0, rangeFinder.driveTrain.GetForwardVelocity()];
 
             u = [cos(theta), sin(theta)];
             correctedDistance = distance + dot(velocity, u);
             
             dDistance_dTheta = (correctedDistance - rangeFinder.lastDistance) / (theta - rangeFinder.lastTheta);
+            fprintf("Recorded angle: %.2frad\nRecorded distance: %.2fcm\nCorrected distance: %.2fcm\ndDistance_dTheta: %.2fcm/rad\n", theta, distance, correctedDistance, dDistance_dTheta);
             
             if ((dDistance_dTheta == 0) && (rangeFinder.last_dDdT == 0))
                 % Cannot determine max or min
@@ -103,18 +117,18 @@ classdef RangeFinder < handle
                     fprintf("An undefined range detected from %.2f rad to %.2f rad\n", rangeFinder.lastTheta, theta);
                 end
 
-            elseif ((dDistance_dTheta <= 0) && (rangeFinder.last_dDdT >= 0))
+            elseif ((rangeFinder.last_dDdT <= 0) && (dDistance_dTheta >= 0))
                 % There is a minimum distance to the measured surface
                 rangeFinder.nextScan.addMinima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
                 if (rangeFinder.DEBUG)
-                    fprintf("A local minimum was detected between %.2f rad and %.2f rad at ~%.2fcm\n", rangeFinder.lastTheta, theta, (correctedDistance + rangeFinder.lastDistance) / 2.0);
+                    fprintf("A local minimum was detected between %.2f rad and %.2f rad at (%.2fcm, %.2fcm)\n", rangeFinder.lastTheta, theta, rangeFinder.lastDistance, correctedDistance);
                 end
                 
-            elseif ((dDistance_dTheta >= 0) && (rangeFinder.last_dDdT <= 0))
+            elseif ((rangeFinder.last_dDdT >= 0) && (dDistance_dTheta <= 0))
                 % There is a maximum distance to the measured surface
                 rangeFinder.nextScan.addMaxima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
                 if (rangeFinder.DEBUG)
-                    fprintf("A local maximum was detected between %.2f rad and %.2f rad at ~%.2fcm\n", rangeFinder.lastTheta, theta, (correctedDistance + rangeFinder.lastDistance) / 2.0);
+                    fprintf("A local maximum was detected between %.2f rad and %.2f rad (%.2fcm, %.2fcm)\n", rangeFinder.lastTheta, theta, rangeFinder.lastDistance, correctedDistance);
                 end
             end
 

@@ -120,6 +120,10 @@ classdef DriveTrain < handle
             end
         end
 
+        function vel = GetForwardVelocity(driveTrain)
+            vel = (driveTrain.leftMotor.GetCurrentVelocityTarget() + driveTrain.rightMotor.GetCurrentVelocityTarget()) ^ (0.5);
+        end
+
         function SetBackwardVelocity(driveTrain, targetVelocity)
             % Sets the backward target velocity
             arguments (Input)
