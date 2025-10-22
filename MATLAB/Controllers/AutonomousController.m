@@ -14,6 +14,7 @@ classdef AutonomousController
         driveTrain DriveTrain   % The drive train controlled by this controller
         rangeFinder RangeFinder % The range finder for this controller to use
         colorSensor ColorSensor % The color sensor for this controller to use
+        touchSensor TouchSensor % The touch sensor for this controller to use
 
         relativeTargetBearing double % The bearing of the true forward direction relative to the direction of the drivetrain
     end
@@ -31,12 +32,13 @@ classdef AutonomousController
     end
 
     methods (Access = public)
-        function controller = AutonomousController(driveTrain, rangeFinder, colorSensor)
+        function controller = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor)
             % Initializes the properties of a new AutonomousController object
             arguments (Input)
                 driveTrain DriveTrain   % The drive train controlled by this controller
                 rangeFinder RangeFinder % The range finder for this controller to use
                 colorSensor ColorSensor % The color sensor for this controller to use
+                touchSensor TouchSensor % The touch sensor for this controller to use
             end
             arguments (Output)
                 controller AutonomousController
@@ -44,6 +46,7 @@ classdef AutonomousController
             controller.driveTrain = driveTrain;
             controller.rangeFinder = rangeFinder;
             controller.colorSensor = colorSensor;
+            controller.touchSensor = touchSensor;
 
             controller.relativeTargetBearing = 0.0;
         end

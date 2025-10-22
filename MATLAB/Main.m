@@ -4,6 +4,11 @@ driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
 arm = Motor(brick, 'C');
 manualController = ManualController(keyboard, driveTrain, arm);
+% rangeFinder = RangeFinder(arm, ultrasonicSensor);
+% colorSensor = ColorSensor(brick, 'PORT NUMBER');
+% touchSensor = TouchSensor(brick, 'PORT NUMBER');
+% ultrasonicSensor = UltrasonicSensor(brick, "PORT NUMBER");
+% autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
 
 
 % State Encodings
@@ -30,6 +35,8 @@ while state ~= 2
 
         case 1    % Autonomous Control Loop
             fprintf("Switched to Automatic Control\n");
+
+           % autonomousController.Navigate("insert color here");
             state = 0;
 
         otherwise % Invalid State
