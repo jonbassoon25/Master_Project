@@ -11,10 +11,7 @@ manualController = ManualController(keyboard, driveTrain, arm);
 % rangeFinder = RangeFinder(rotator, ultrasonicSensor);
 % autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
 
-
-
 state = States.ManualControl; % Initial State
-
 
 while state ~= States.Exit
     pause(0.05); % Allow keyboard to take input
