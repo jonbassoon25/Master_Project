@@ -31,8 +31,9 @@ while state ~= States.Exit
         case States.AutonomousControl    % Autonomous Control Loop
             fprintf("Switched to Automatic Control\n");
 
+
            % Refer to Enums -> Colors for which color we want
-           % autonomousController.Navigate(Colors.Blue);
+            autonomousController.Navigate(Colors.Blue);
             state = States.ManualControl;
 
         otherwise % Invalid State
