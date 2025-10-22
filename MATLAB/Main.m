@@ -4,10 +4,11 @@ driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
 arm = Motor(brick, 'C');
 manualController = ManualController(keyboard, driveTrain, arm);
-% rangeFinder = RangeFinder(arm, ultrasonicSensor);
-% colorSensor = ColorSensor(brick, 'PORT NUMBER');
-% touchSensor = TouchSensor(brick, 'PORT NUMBER');
-% ultrasonicSensor = UltrasonicSensor(brick, "PORT NUMBER");
+% rotator = Motor(brick, 'B');
+% colorSensor = ColorSensor(brick, -1);
+% touchSensor = TouchSensor(brick, -1);
+% ultrasonicSensor = UltrasonicSensor(brick, -1);
+% rangeFinder = RangeFinder(rotator, ultrasonicSensor);
 % autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
 
 
