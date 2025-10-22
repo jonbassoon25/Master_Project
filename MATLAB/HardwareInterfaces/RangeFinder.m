@@ -18,6 +18,7 @@ classdef RangeFinder < handle
 
         lastScan RangeScan % The last complete scan
         nextScan RangeScan % The scan that is currently being built
+        fullScanMode logical % Are we currently doing a full scan
 
         lastDistance double % The last recorded distance of the ultrasonic sensor
         lastTheta double % The last recorded angle of the ultrasonic sensor rotator
@@ -47,10 +48,11 @@ classdef RangeFinder < handle
 
         function scan = CompleteFullScan(rangeFinder)
             rangeFinder.nextScan = RangeScan();
-            rangeFinder.lastScan = [];
+            rangeFinder.lastScan = RangeScan();
+            rangeFinder.fullScanMode = true;
             
             if (rangeFinder.DEBUG)
-                fprintf("Performing full scan...\n");
+                fprintf("Clearing rangefinder data & performing a full scan...\n");
             end
             
             % Rotate the scan motor to the correct position
@@ -67,7 +69,7 @@ classdef RangeFinder < handle
                 fprintf("Setting range finder velocity target to %.2f deg/s\n", rangeFinder.SCAN_SPEED);
             end
             samples = 0;
-            while (isempty(rangeFinder.lastScan))
+            while (rangeFinder.fullScanMode)
                 rangeFinder.Update();
                 samples = samples + 1;
             end
@@ -122,11 +124,13 @@ classdef RangeFinder < handle
                 rangeFinder.motor.SetVelocityTarget(-rangeFinder.SCAN_SPEED);
                 rangeFinder.lastScan = rangeFinder.nextScan;
                 rangeFinder.nextScan = RangeScan();
+                rangeFinder.fullScanMode = false;
             elseif (abs(theta) < rangeFinder.SCAN_FOV / 2.0)
                 fprintf("Updating last scan. Motor past lower FOV bound.\n");
                 rangeFinder.motor.SetVelocityTarget(rangeFinder.SCAN_SPEED);
                 rangeFinder.lastScan = rangeFinder.nextScan;
                 rangeFinder.nextScan = RangeScan();
+                rangeFinder.fullScanMode = false;
             end
         end
     end
