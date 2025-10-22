@@ -31,6 +31,15 @@ classdef AutonomousController
         controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelociity);
         controller.driveTrain.MangageVelocityTargets();
         end
+        function TurnRight(controller)
+        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelocity);
+        controller.driveTrain.ManageVelocityTargets();
+        end
+        function TurnLeft(controller)
+        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelocity);
+        controller.driveTrain.ManageVelocityTargets();
+        end
+        
     end
 
     methods (Access = public)
