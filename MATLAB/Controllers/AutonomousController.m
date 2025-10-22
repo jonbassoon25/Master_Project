@@ -16,6 +16,8 @@ classdef AutonomousController
     end
 
     properties (Access = protected)
+        targetForwardVelocity double % The current target forward velocity in cm/s
+        targetAngularVelocity double % The current target angular velocity in deg/s counter clockwise
         driveTrain DriveTrain   % The drive train controlled by this controller
         rangeFinder RangeFinder % The range finder for this controller to use
         colorSensor ColorSensor % The color sensor for this controller to use
