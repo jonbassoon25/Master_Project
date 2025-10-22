@@ -1,7 +1,7 @@
 brick = ConnectBrick('GROUP6');
 
 rotator = Motor(brick, 'B');
-ultrasonicSensor = UltrasonicSensor(brick, -1);
+ultrasonicSensor = UltrasonicSensor(brick, 3);
 rangeFinder = RangeFinder(rotator, ultrasonicSensor);
 
 rangeFinder.CompleteFullScan();

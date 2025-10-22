@@ -127,6 +127,10 @@ classdef Motor < handle
             motor.brick.StopMotor(motor.port, brake);
         end
 
+        function SendOutputPower(motor, controlPower)
+            % Control power between 0 and 1
+            motor.brick.MoveMotor(motor.port, controlPower * 100);
+        end
         
         function ClearTargets(motor)
             % Clears this motor's set targets
