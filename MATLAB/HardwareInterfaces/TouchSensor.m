@@ -1,12 +1,12 @@
 classdef TouchSensor
     % A hardware interface for a touch sensor
 
-    properties
+    properties (Access = protected)
         brick Brick
         port uint8
     end
 
-    methods
+    methods (Access = public)
         function sensor = TouchSensor(brick, port)
             sensor.brick = brick;
             sensor.port = port;
