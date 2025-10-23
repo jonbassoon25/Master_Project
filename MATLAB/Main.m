@@ -31,10 +31,24 @@ while state ~= States.Exit
         case States.AutonomousControl    % Autonomous Control Loop
             fprintf("Switched to Automatic Control\n");
 
+            if (colorSensor.GetColor == Colors.Blue) 
+            % Pickup Passenger
+            % Probably don't implement the code until navigation is sound
+            
+            autonomousController.Navigate(Colors.Yellow);
 
-           % Refer to Enums -> Colors for which color we want
+            elseif (colorSensor.GetColor == Colors.Yellow)
+                %FINISHED THE COURSE! YEAAHHHH!!!
+                state = States.ManualControl;
+
+            
+            else
+                autonomousController.Navigate(Colors.Blue)
+            end
+
             autonomousController.Navigate(Colors.Blue);
             state = States.ManualControl;
+            
 
         otherwise % Invalid State
             fprintf("Invalid State Encoding: %d. Defaulting to Manual Control.", state);

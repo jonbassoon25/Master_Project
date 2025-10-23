@@ -27,24 +27,35 @@ classdef AutonomousController
     end
 
     methods (Access = protected)
-        function bool = ShouldTurnLeft(controller) % TODO: Implement ShouldTurnLeft function
-            bool = false;
-        end
-        function bool = ShouldTurnRight(controller) % TODO: Implement ShouldTurnRight function
+
+        function bool = ShouldStop(controller)     % TODO: Implement ShouldStop function
             bool = false;
         end
 
-        function MoveForward(controller) % TODO: Implement MoveForward function
-        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelociity);
-        controller.driveTrain.MangageVelocityTargets();
+        function bool = ShouldTurnLeft(controller) % TODO: Implement ShouldTurnLeft function
+            bool = false;
+        end
+        function bool = ShouldTurnRight(controller)% TODO: Implement ShouldTurnRight function
+            bool = false;
+        end
+        
+        function Stop(controller) % TODO: Implement Stop function
+            controller.driveTrain.Stop();
+        end
+        function MoveForward(controller)
+            controller.targetForwardVelocity = controller.targetForwardVelocity + controller.FORWARD_ACCELERATION;
+            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
+            controller.driveTrain.MangageVelocityTargets();
         end
         function TurnRight(controller)
-        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelocity);
-        controller.driveTrain.ManageVelocityTargets();
+            controller.targetAngularVelocity = controller.targetAngularVelocity - controller.ANGULAR_ACCELERATION;
+            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
+            controller.driveTrain.ManageVelocityTargets();
         end
         function TurnLeft(controller)
-        controller.driveTrain.SetMixedMovementTargets(controller.targetForwardsVelocity, controller.targetAngularVelocity);
-        controller.driveTrain.ManageVelocityTargets();
+            controller.targetAngularVelocity = controller.targetAngularVelocity + controller.ANGULAR_ACCELERATION;
+            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
+            controller.driveTrain.ManageVelocityTargets();
         end
         
     end
@@ -80,9 +91,12 @@ classdef AutonomousController
             if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
                 % Check right
                 if (controller.ShouldTurnLeft)
-                    TurnLeft();
+                    TurnLeft(); 
                 elseif (controller.ShouldTurnRight())
-                    TurnRight(); % Implement TurnRight function
+                    TurnRight(); 
+
+                elseif (controller.ShouldStop())
+                    Stop();
                 else
                     % No valid moves
                 end
