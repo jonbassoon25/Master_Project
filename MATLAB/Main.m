@@ -4,12 +4,12 @@ driveTrain = DriveTrain(brick, 'A', 'D');
 keyboard = Keyboard();
 arm = Motor(brick, 'C');
 manualController = ManualController(keyboard, driveTrain, arm);
-% rotator = Motor(brick, 'B');
-% colorSensor = ColorSensor(brick, -1);
-% touchSensor = TouchSensor(brick, -1);
-% ultrasonicSensor = UltrasonicSensor(brick, -1);
-% rangeFinder = RangeFinder(rotator, ultrasonicSensor);
-% autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
+rotator = Motor(brick, 'B');
+colorSensor = ColorSensor(brick, -1);
+touchSensor = TouchSensor(brick, -1);
+ultrasonicSensor = UltrasonicSensor(brick, -1);
+rangeFinder = RangeFinder(rotator, ultrasonicSensor);
+autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
 
 state = States.ManualControl; % Initial State
 
