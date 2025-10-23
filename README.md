@@ -14,4 +14,4 @@ Manual Control
 Autonomous Control
 ADD HERE
 
-[UML Class Diagram](https://github.com/jonbassoon25/Master_Project/blob/main/Overarching_UML_Diagram.png)
+1. [UML Class Diagram](https://github.com/jonbassoon25/Master_Project/blob/main/Overarching_UML_Diagram.png)
