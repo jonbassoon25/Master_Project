@@ -86,10 +86,17 @@ classdef AutonomousController
             % the target color is reached.
             arguments (Input)
                 targetColor Colors % The target color to look for
+                distanceFront double
             end
 
             %Loop checking color
             while (colorSensor.GetColor() ~= targetColor) 
+
+                % TODO : Constantly complete scans and find where it is
+                % parallel to wall
+                % controller.rangeFinder.CompleteFullScan()
+
+                
 
                 if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
                     % Check right
