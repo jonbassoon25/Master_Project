@@ -39,13 +39,14 @@ classdef AutonomousController
             bool = false;
         end
         
-        function Stop(controller) % TODO: Implement Stop function
+        function Stop(controller)
             controller.driveTrain.Stop();
         end
         function MoveForward(controller)
             controller.targetForwardVelocity = controller.targetForwardVelocity + controller.FORWARD_ACCELERATION;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.MangageVelocityTargets();
+            
         end
         function TurnRight(controller)
             controller.targetAngularVelocity = controller.targetAngularVelocity - controller.ANGULAR_ACCELERATION;
@@ -87,22 +88,28 @@ classdef AutonomousController
                 targetColor Colors % The target color to look for
             end
 
-            % Autonomous control logic, derived from Sophia's 'autonomous control' file
-            if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
-                % Check right
-                if (controller.ShouldTurnLeft)
-                    TurnLeft(); 
-                elseif (controller.ShouldTurnRight())
-                    TurnRight(); 
+            %Loop checking color
+            while (colorSensor.GetColor() ~= targetColor) 
 
-                elseif (controller.ShouldStop())
-                    Stop();
+                if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
+                    % Check right
+                    if (controller.ShouldTurnLeft)
+                        TurnLeft(); 
+                    elseif (controller.ShouldTurnRight())
+                        TurnRight(); 
+    
+                    elseif (controller.ShouldStop())
+                        Stop();
+                    else
+                        % No valid moves
+                    end
                 else
-                    % No valid moves
+                    MoveForward(); % Implement moveForward function
                 end
-            else
-                MoveForward(); % Implement moveForward function
+                
             end
+                % Ensures Car Stops
+                controller.driveTrain.Stop();
         end
     end
 end
