@@ -150,11 +150,8 @@ classdef AutonomousController
                     % continued execution of the navigation loop
                     controller.driveTrain.Stop();
                 end
-                
-                
-                
             end
-            % Ensures Car Stops
+            % Ensures that the car & rangefinder stop
             controller.driveTrain.Stop();
             controller.rangeFinder.Stop();
         end
