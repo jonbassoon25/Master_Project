@@ -95,33 +95,68 @@ classdef AutonomousController
             %   -  If there is no opening to the left, front, or right, turn around & move forwards
             %   -  If there is a red line at any point, stop for 2 seconds
 
-            %Loop checking color
+            % Start the rangeFinder
+            controller.rangeFinder.Start();
+
+            % Check color to determine if we have reached the navigation target
             while (controller.colorSensor.GetColor() ~= targetColor) 
+                % Update the rangeFinder
+                controller.rangeFinder.Update();
                 % TODO : Constantly complete scans and find where it is
                 % parallel to wall
-                % controller.rangeFinder.CompleteFullScan()
 
+                % Collect distance data
                 distanceFront = controller.rangeFinder.GetMinDistanceBearing(0.0, false);
+                distanceLeft = controller.rangeFinder.GetMinDistanceBearing(-90.0, false);
+                distanceRight = controller.rangeFinder.GetMinDistanceBearing(90.0, false);
+                
+                % Calculate navigation booleans
+                wallDetectionThreshold = controller.MAZE_TILE_SIZE / 2.0;
+                frontWallDetected = (distanceFront <= wallDetectionThreshold);
+                leftWallDetected  = (distanceLeft  <= wallDetectionThreshold);
+                rightWallDetected = (distanceRight <= wallDetectionThreshold);
 
-                if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
-                    % Check left & right
-                    if (controller.ShouldTurnLeft())
-                        TurnLeft(); 
-                    elseif (controller.ShouldTurnRight())
-                        TurnRight(); 
-    
-                    elseif (controller.ShouldStop())
-                        Stop();
-                    else
-                        % No valid moves
-                    end
+                % Implement navigation logic
+                if (~leftWallDetected)
+                    % Turn left
+                elseif (~frontWallDetected)
+                    % Go forward
+                elseif (~rightWallDetected)
+                    % Turn right
                 else
-                    MoveForward(); % Implement moveForward function
+                    % Turn around & go forward
                 end
+
+                % Stop for red bars
+                if (controller.colorSensor.GetColor() == Colors.Red)
+                    % Stop
+                    controller.driveTrain.Stop();
+
+                    % Wait 2 seconds
+                    timeStart = tic;
+                    while (toc(timeStart) < 2.0)
+                        pause(0.1);
+                    end
+
+                    % Move forward for 1 second to move past the stop bar
+                    controller.driveTrain.SetForwardVelocity(controller.DRIVE_VELOCITY);
+                    timeStart = tic;
+                    while (toc(timeStart) < 1.0)
+                        controller.driveTrain.ManageVelocityTargets();
+                        pause(0.05);
+                    end
+
+                    % Reset the drive train to its default state for
+                    % continued execution of the navigation loop
+                    controller.driveTrain.Stop();
+                end
+                
+                
                 
             end
             % Ensures Car Stops
             controller.driveTrain.Stop();
+            controller.rangeFinder.Stop();
         end
     end
 end
