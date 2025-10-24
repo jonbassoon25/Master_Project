@@ -93,6 +93,7 @@ classdef AutonomousController
             %   -  If the is an opening to the front and/or right, continue forwards
             %   -  If there is an opening on the right, turn right
             %   -  If there is no opening to the left, front, or right, turn around & move forwards
+            %   -  If there is a red line at any point, stop for 2 seconds
 
             %Loop checking color
             while (controller.colorSensor.GetColor() ~= targetColor) 
