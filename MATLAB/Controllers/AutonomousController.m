@@ -24,21 +24,6 @@ classdef AutonomousController
     end
 
     methods (Access = protected)
-
-        function bool = ShouldStop(controller)     % TODO: Implement ShouldStop function
-            bool = false;
-        end
-
-        function bool = ShouldTurnLeft(controller) % TODO: Implement ShouldTurnLeft function
-            bool = false;
-        end
-        function bool = ShouldTurnRight(controller)% TODO: Implement ShouldTurnRight function
-            bool = false;
-        end
-        
-        function Stop(controller)
-            controller.driveTrain.Stop();
-        end
         function MoveForward(controller)
             % Moves the car forward while keeping it parallel to the left & right walls
 
