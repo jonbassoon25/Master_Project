@@ -6,24 +6,21 @@ classdef AutonomousController
     end
 
     properties (Constant, Access = protected)
-        MAZE_TILE_SIZE double = 12.0; % The size of the maze tiles in cm
+        MAZE_TILE_SIZE double = 12.0;                % The size of the maze tiles in cm
         TARGET_BEARING_PID PID = PID(0.05, 80, 0.2); % The target bearing PID controller. Allows the vehicle to automatically correct its bearing.
-        FORWARD_ACCELERATION double = 36.0  % The forward acceleration constant in cm/s²
-        ANGULAR_ACCELERATION double = 120.0 % The angular acceleration constant in deg/s² counter clockwise
-        ARM_ACCELERATION double = 120.0     % The angular acceleration constnt in deg/s² counter clockwise
-        MAX_DRIVE_VELOCITY double = 180.0   % The maximum foward velocity magnitude in cm/s
-        MAX_TURNING_RATE double = 720.0     % The maximum turning rate magnitude in deg/s
+        DRIVE_VELOCITY double = 180.0                % The maximum foward velocity magnitude in cm/s
+        TURNING_RATE double = 720.0                  % The maximum turning rate magnitude in deg/s
     end
 
     properties (Access = protected)
         targetForwardVelocity double % The current target forward velocity in cm/s
         targetAngularVelocity double % The current target angular velocity in deg/s counter clockwise
-        driveTrain DriveTrain   % The drive train controlled by this controller
-        rangeFinder RangeFinder % The range finder for this controller to use
-        colorSensor ColorSensor % The color sensor for this controller to use
-        touchSensor TouchSensor % The touch sensor for this controller to use
+        driveTrain DriveTrain        % The drive train controlled by this controller
+        rangeFinder RangeFinder      % The range finder for this controller to use
+        colorSensor ColorSensor      % The color sensor for this controller to use
+        touchSensor TouchSensor      % The touch sensor for this controller to use
 
-        relativeTargetBearing double % The bearing of the true forward direction relative to the direction of the drivetrain
+        trueForwardBearing double % The bearing of the true forward direction relative to the direction of the drivetrain
     end
 
     methods (Access = protected)
@@ -43,22 +40,20 @@ classdef AutonomousController
             controller.driveTrain.Stop();
         end
         function MoveForward(controller)
-            controller.targetForwardVelocity = controller.targetForwardVelocity + controller.FORWARD_ACCELERATION;
+            controller.targetForwardVelocity = controller.DRIVE_VELOCITY;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.MangageVelocityTargets();
-            
         end
         function TurnRight(controller)
-            controller.targetAngularVelocity = controller.targetAngularVelocity - controller.ANGULAR_ACCELERATION;
+            controller.targetAngularVelocity = -controller.TURNING_RATE;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.ManageVelocityTargets();
         end
         function TurnLeft(controller)
-            controller.targetAngularVelocity = controller.targetAngularVelocity + controller.ANGULAR_ACCELERATION;
+            controller.targetAngularVelocity = controller.TURNING_RATE;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.ManageVelocityTargets();
         end
-        
     end
 
     methods (Access = public)
@@ -78,29 +73,32 @@ classdef AutonomousController
             controller.colorSensor = colorSensor;
             controller.touchSensor = touchSensor;
 
-            controller.relativeTargetBearing = 0.0;
+            % Populate rangefinder scan
+            controller.rangeFinder.CompleteFullScan();
+
+            % Get the initial true forward bearing value
+            controller.trueForwardBearing = controller.rangeFinder.GetTrueForwardBearing();
         end
 
         function Navigate(controller, targetColor)
             % Turns on autonomous navigation. Does not return control until
             % the target color is reached.
             arguments (Input)
-                targetColor Colors % The target color to look for
-                distanceFront double
+                controller AutonomousController % This controller object
+                targetColor Colors              % The target color to look for
             end
 
             %Loop checking color
-            while (colorSensor.GetColor() ~= targetColor) 
-
+            while (controller.colorSensor.GetColor() ~= targetColor) 
                 % TODO : Constantly complete scans and find where it is
                 % parallel to wall
                 % controller.rangeFinder.CompleteFullScan()
 
-                
+                distanceFront = controller.rangeFinder.GetMinDistanceBearing(0.0, false);
 
                 if distanceFront < controller.MAZE_TILE_SIZE / 2.0 % Threshold for wall detection
-                    % Check right
-                    if (controller.ShouldTurnLeft)
+                    % Check left & right
+                    if (controller.ShouldTurnLeft())
                         TurnLeft(); 
                     elseif (controller.ShouldTurnRight())
                         TurnRight(); 
@@ -115,8 +113,8 @@ classdef AutonomousController
                 end
                 
             end
-                % Ensures Car Stops
-                controller.driveTrain.Stop();
+            % Ensures Car Stops
+            controller.driveTrain.Stop();
         end
     end
 end
