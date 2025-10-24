@@ -1,6 +1,8 @@
 classdef RangeFinder < handle
     % Controls the RangeFinder of the vehicle
 
+    %TODO: FIX BEARING DEGREES SO THAT THEY ARE CLOCKWISE FOR +rad INSTEAD OF COUNTERCLOCKWISE FOR +rad
+
     properties (Constant, Access = private)
         DEBUG = true
     end
@@ -150,6 +152,35 @@ classdef RangeFinder < handle
                 rangeFinder.nextScan = RangeScan();
                 rangeFinder.fullScanMode = false;
             end
+        end
+
+        function bearing = GetTrueForwardBearing(rangeFinder)
+            % TODO: Implement
+            bearing = 0.0;
+        end
+        
+        function distance = GetMinDistanceBearing(rangeFinder, degrees, relativeBearing)
+            arguments (Input)
+                rangeFinder RangeFinder % This rangefinder object
+                degrees double          % The bearing in degrees to check
+                relativeBearing logical % Is the bearing relative to the car (1) or to the maze (0)
+            end
+            arguments (Output)
+                distance double % The approximate distance to the wall in the specified direction
+            end
+            % Calculates the true minimum distance to a wall in the
+            % specified direction from forwards or NaN if no real distance
+            % exists
+
+            % TODO: Implement
+        end
+
+        function distance = GetMaxDistanceBearing(rangeFinder, degrees, relativeBearing)
+            % Calculates the true maximum distance to a wall in the
+            % specified direction from forwards or NaN if no real distance
+            % exists
+            
+            % TODO: Implement
         end
     end
 end
