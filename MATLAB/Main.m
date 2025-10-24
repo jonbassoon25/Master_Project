@@ -13,6 +13,10 @@ autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor
 
 state = States.ManualControl; % Initial State
 
+autonomousTargetLocations = Queue(); % A queue for the locations that the autonomous controller should navigate to
+autonomousTargetLocations.Enqueue(Colors.Blue);   % Location #1
+autonomousTargetLocations.Enqueue(Colors.Yellow); % Location #2
+
 while state ~= States.Exit
     pause(0.05); % Allow keyboard to take input
 
@@ -28,32 +32,29 @@ while state ~= States.Exit
                 state = States.AutonomousControl;
             end
 
-        case States.AutonomousControl    % Autonomous Control Loop
-            fprintf("Switched to Automatic Control\n");
+        case States.AutonomousControl
+            fprintf("Switched to Automatic Control.\n");
 
-            if (colorSensor.GetColor == Colors.Blue) 
-            % Pickup Passenger
-            % Probably don't implement the code until navigation is sound
-            
-            autonomousController.Navigate(Colors.Yellow);
-
-            elseif (colorSensor.GetColor == Colors.Yellow)
-                %FINISHED THE COURSE! YEAAHHHH!!!
-                state = States.ManualControl;
-
-            
+            % This check occurs only as autonomous control is entered
+            if (autonomousTargetLocations.length == 0)
+                fprintf("WARNING: No defined next location. Automatic control cannot activate.\n")
             else
-                autonomousController.Navigate(Colors.Blue)
+                % Navigate to the next location in the navigation queue
+                autonomousController.Navigate(autonomousTargetLocations.Dequeue());
+                fprintf("The target location was reached.\n");
             end
-
-            autonomousController.Navigate(Colors.Blue);
-            state = States.ManualControl;
+                
+            % Return control to the user
+            fprintf("Returning to Manual Control.\n")
+            state = states.ManualControl;
             
-
         otherwise % Invalid State
-            fprintf("Invalid State Encoding: %d. Defaulting to Manual Control.", state);
+            fprintf("Invalid State Encoding: %d. Defaulting to Manual Control.\n", state);
             state = States.ManualControl;
     end
 end
 
+driveTrain.Stop();
+arm.Stop();
+rangeFinder.Stop();
 clear; % Destroy all objects stored in the workspace
