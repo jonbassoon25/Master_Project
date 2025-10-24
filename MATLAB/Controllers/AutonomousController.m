@@ -40,16 +40,31 @@ classdef AutonomousController
             controller.driveTrain.Stop();
         end
         function MoveForward(controller)
+            % Moves the car forward while keeping it parallel to the left &
+            % right walls
+
+            
+            % Temporary code
             controller.targetForwardVelocity = controller.DRIVE_VELOCITY;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.MangageVelocityTargets();
         end
         function TurnRight(controller)
+            % Turns the car through the middle of a detected opening on the
+            % right. Does not return control until the turn is complete
+
+
+            % Temporary code
             controller.targetAngularVelocity = -controller.TURNING_RATE;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.ManageVelocityTargets();
         end
         function TurnLeft(controller)
+            % Turns the car through the middle of a detected opening on the
+            % left. Does not return control until the turn is complete
+
+
+            % Temporary code
             controller.targetAngularVelocity = controller.TURNING_RATE;
             controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
             controller.driveTrain.ManageVelocityTargets();
@@ -102,8 +117,6 @@ classdef AutonomousController
             while (controller.colorSensor.GetColor() ~= targetColor) 
                 % Update the rangeFinder
                 controller.rangeFinder.Update();
-                % TODO : Constantly complete scans and find where it is
-                % parallel to wall
 
                 % Collect distance data
                 distanceFront = controller.rangeFinder.GetMinDistanceBearing(0.0, false);
