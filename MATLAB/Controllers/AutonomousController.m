@@ -88,6 +88,12 @@ classdef AutonomousController
                 targetColor Colors              % The target color to look for
             end
 
+            % Navigation Logic:
+            %   -  If there is an opening on the left and/or right and/or front, turn left
+            %   -  If the is an opening to the front and/or right, continue forwards
+            %   -  If there is an opening on the right, turn right
+            %   -  If there is no opening to the left, front, or right, turn around & move forwards
+
             %Loop checking color
             while (controller.colorSensor.GetColor() ~= targetColor) 
                 % TODO : Constantly complete scans and find where it is
