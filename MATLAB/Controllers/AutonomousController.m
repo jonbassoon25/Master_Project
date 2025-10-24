@@ -40,8 +40,7 @@ classdef AutonomousController
             controller.driveTrain.Stop();
         end
         function MoveForward(controller)
-            % Moves the car forward while keeping it parallel to the left &
-            % right walls
+            % Moves the car forward while keeping it parallel to the left & right walls
 
             
             % Temporary code
@@ -50,8 +49,8 @@ classdef AutonomousController
             controller.driveTrain.MangageVelocityTargets();
         end
         function TurnRight(controller)
-            % Turns the car through the middle of a detected opening on the
-            % right. Does not return control until the turn is complete
+            % Turns the car through the middle of a detected opening on the right
+            % This function does not return control until the turn is complete
 
 
             % Temporary code
@@ -60,8 +59,8 @@ classdef AutonomousController
             controller.driveTrain.ManageVelocityTargets();
         end
         function TurnLeft(controller)
-            % Turns the car through the middle of a detected opening on the
-            % left. Does not return control until the turn is complete
+            % Turns the car through the middle of a detected opening on the left
+            % This function does not return control until the turn is complete
 
 
             % Temporary code
