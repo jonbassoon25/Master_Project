@@ -1,5 +1,5 @@
 # Master Project
-### by group 
+### by group 7
 
 
 ## Flowcharts and Diagram Describing Procecees
