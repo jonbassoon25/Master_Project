@@ -2,6 +2,7 @@ classdef RangeFinder < handle
     % Controls the RangeFinder of the vehicle
 
     %TODO: FIX BEARING DEGREES SO THAT THEY ARE CLOCKWISE FOR +rad INSTEAD OF COUNTERCLOCKWISE FOR +rad
+    %TODO: RECORD THETA & DISTANCE OF N-2 TO N FOR MIN/MAX RANGES INSTEAD OF N-1 TO N
 
     properties (Constant, Access = private)
         DEBUG = true
