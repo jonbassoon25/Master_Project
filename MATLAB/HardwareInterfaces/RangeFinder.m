@@ -18,13 +18,13 @@ classdef RangeFinder < handle
         ultraSensor UltrasonicSensor
         targetMotorVelocity double
 
-        lastScan RangeScan % The last complete scan
-        nextScan RangeScan % The scan that is currently being built
+        lastScan RangeScan   % The last complete scan
+        nextScan RangeScan   % The scan that is currently being built
         fullScanMode logical % Are we currently doing a full scan
 
-        lastDistance double % The last recorded distance of the ultrasonic sensor
-        lastTheta double % The last recorded angle of the ultrasonic sensor rotator
-        last_dDdT double % The last recorded change in distance per change in theta
+        lastDistance double     % The last recorded distance of the ultrasonic sensor
+        lastTheta double        % The last recorded angle of the ultrasonic sensor rotator
+        last_dDdT double        % The last recorded change in distance per change in theta
         SCAN_OFFSET double = 0  % Offset of the 0 of the scan motor in degrees
     end
 
