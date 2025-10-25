@@ -156,7 +156,10 @@ classdef RangeFinder < handle
         end
 
         function bearing = GetTrueForwardBearing(rangeFinder)
-            % TODO: Implement
+            % Calculates the true forward bearing of the car based on the
+            % last complete scan
+
+            % Determine the min distance to the wall left & right
             i = 0;
             leftBearing = NaN;
             rightBearing = NaN;
@@ -175,31 +178,30 @@ classdef RangeFinder < handle
                 end
             end
 
-            % If readings on both sides
-            if (~isnan(leftBearing) && ~isnan(rightBearing))
-                % Desmos Math Link: https://www.desmos.com/calculator/sqiqjkkxmg
-                avgRightDistance = (rightBearing.distance1 + rightBearing.distance2) / 2.0;
+            % Calculate the true forward bearing
+            % Desmos Math Link: https://www.desmos.com/calculator/sqiqjkkxmg
+            if (~isnan(leftBearing))
                 avgLeftDistance = (leftBearing.distance1 + leftBearing.distance2) / 2.0;
-                avgRightTheta = (rightBearing.theta1 + rightBearing.theta2) / 2.0;
                 avgLeftTheta = (leftBearing.theta1 + leftBearing.theta2) / 2.0;
-
                 d0 = avgLeftDistance;
                 t0 = avgLeftTheta;
+            else
+                d0 = 0.0;
+                t0 = 0.0;
+            end
+            if (~isnan(rightBearing))
+                avgRightDistance = (rightBearing.distance1 + rightBearing.distance2) / 2.0;
+                avgRightTheta = (rightBearing.theta1 + rightBearing.theta2) / 2.0;
                 d1 = avgRightDistance;
                 t1 = avgRightTheta;
-
-                bearing = (180/pi) * acos((d1*cos(t1) - d0*cos(t0)) / (sqrt((d1*sin(t1)-d0*sin(t0))^2 + (d1*cos(t1)-d0*cos(t0))^2))) * sign(d1*sin(t1)-d0*sin(t0));
-            
-            %positive bearing right
-            elseif (~isnan(leftBearing))
-                
-
-            elseif (~isnan(rightBearing))
-
-            else 
-            %If left & right bearings = NaN
-            
+            else
+                d1 = 0.0;
+                t1 = 0.0;
             end
+
+            % Bearing will be NaN if there are no recorded sides. Will
+            % calculate based on 1 side if a side is missing
+            bearing = (180/pi) * acos((d1*cos(t1) - d0*cos(t0)) / (sqrt((d1*sin(t1)-d0*sin(t0))^2 + (d1*cos(t1)-d0*cos(t0))^2))) * sign(d1*sin(t1)-d0*sin(t0));
         end
         
         function distance = GetMinDistanceBearing(rangeFinder, degrees, relativeBearing)
