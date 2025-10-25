@@ -177,7 +177,18 @@ classdef RangeFinder < handle
 
             % If readings on both sides
             if (~isnan(leftBearing) && ~isnan(rightBearing))
-                
+                % Desmos Math Link: https://www.desmos.com/calculator/sqiqjkkxmg
+                avgRightDistance = (rightBearing.distance1 + rightBearing.distance2) / 2.0;
+                avgLeftDistance = (leftBearing.distance1 + leftBearing.distance2) / 2.0;
+                avgRightTheta = (rightBearing.theta1 + rightBearing.theta2) / 2.0;
+                avgLeftTheta = (leftBearing.theta1 + leftBearing.theta2) / 2.0;
+
+                d0 = avgLeftDistance;
+                t0 = avgLeftTheta;
+                d1 = avgRightDistance;
+                t1 = avgRightTheta;
+
+                bearing = (180/pi) * acos((d1*cos(t1) - d0*cos(t0)) / (sqrt((d1*sin(t1)-d0*sin(t0))^2 + (d1*cos(t1)-d0*cos(t0))^2))) * sign(d1*sin(t1)-d0*sin(t0));
             
             %positive bearing right
             elseif (~isnan(leftBearing))
