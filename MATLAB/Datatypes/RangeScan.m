@@ -10,7 +10,7 @@ classdef RangeScan < handle
     methods (Access = public)
         function scan = RangeScan()
             arguments (Output)
-                scan RangeScan
+                scan RangeScan % The constructed RangeScan object
             end
             scan.minima = LinkedList();
             scan.maxima = LinkedList();
@@ -18,6 +18,7 @@ classdef RangeScan < handle
         end
 
         function addMinima(scan, theta1, distance1, theta2, distance2)
+            % Records a minimum extrema point to this range scan
             arguments (Input)
                 scan RangeScan
                 theta1 double
@@ -42,6 +43,7 @@ classdef RangeScan < handle
         end
 
         function addMaxima(scan, theta1, distance1, theta2, distance2)
+            % Records a maximum extrema point to this range scan
             arguments (Input)
                 scan RangeScan
                 theta1 double
@@ -66,6 +68,7 @@ classdef RangeScan < handle
         end
 
         function addUndefinedRange(scan, lastDefinedTheta, firstUndefinedTheta, lastUndefinedTheta, nextDefinedTheta)
+            % Records an undefined range to this range scan
             arguments (Input)
                 scan RangeScan
                 lastDefinedTheta double
