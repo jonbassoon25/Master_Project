@@ -157,7 +157,38 @@ classdef RangeFinder < handle
 
         function bearing = GetTrueForwardBearing(rangeFinder)
             % TODO: Implement
-            bearing = 0.0;
+            i = 0;
+            leftBearing = NaN;
+            rightBearing = NaN;
+            while (i < rangeFinder.lastScan.minima.length)
+                extremaPoint = rangeFinder.lastScan.minima.Get(i);
+                approxBearing = 90 - rad2deg((extremaPoint.theta1 + extremaPoint.theta2) / 2.0);
+                if (approxBearing < 0) 
+                    if (isnan(leftBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (leftBearing.distance1 + leftBearing.distance2) / 2.0)
+                        leftBearing = approxBearing;
+                    end
+                
+                elseif (approxBearing > 0)
+                    if (isnan(rightBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (rightBearing.distance1 + rightBearing.distance2) / 2.0)
+                        rightBearing = approxBearing;
+                    end
+                end
+            end
+
+            % If readings on both sides
+            if (~isnan(leftBearing) && ~isnan(rightBearing))
+                
+            
+            %positive bearing right
+            elseif (~isnan(leftBearing))
+                
+
+            elseif (~isnan(rightBearing))
+
+            else 
+            %If left & right bearings = NaN
+            
+            end
         end
         
         function distance = GetMinDistanceBearing(rangeFinder, degrees, relativeBearing)

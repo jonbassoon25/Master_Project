@@ -1,7 +1,7 @@
 classdef RangeScan < handle
     % A dataclass for storing range scan data
 
-    properties (Access = protected)
+    properties (Access = public)
         minima LinkedList      % The minima of the scan, sorted by ascending theta
         maxima LinkedList      % The maxima of the scan, sorted by ascending theta
         undefRanges LinkedList % The undefined ranges of the scan, sorted by ascending theta
