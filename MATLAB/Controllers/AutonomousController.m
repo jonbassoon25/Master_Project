@@ -36,18 +36,18 @@ classdef AutonomousController
             controller.driveTrain.ManageVelocityTargets();
         end
 
-        function TurnRight(controller)
-            % Turns the car through the middle of a detected opening on the right
-            % This function does not return control until the turn is complete
-            
-            
-        end
-        
         function TurnLeft(controller)
             % Turns the car through the middle of a detected opening on the left
             % This function does not return control until the turn is complete
-            
-            
+            controller.driveTrain.Stop();
+            controller.driveTrain.TurnLeft(90);
+        end
+
+        function TurnRight(controller)
+            % Turns the car through the middle of a detected opening on the right
+            % This function does not return control until the turn is complete
+            controller.driveTrain.Stop();
+            controller.driveTrain.TurnLeft(-90);
         end
     end
 
