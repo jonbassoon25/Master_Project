@@ -1,0 +1,316 @@
+@startuml
+
+
+
+package "Controllers" {
+
+
+
+
+class ManualController {
+#keyboard : Keyboard
+#driveTrain DriveTrain
+#arm : Motor
+#targetForwardVelocity : double
+#targetAngularVelocity : double
+#targetArmVelocity : double
+#FORWARD_ACCELERATION : double
+#ANGULAR_ACCLERATION : double
+#ARM_ACCELERATION : double
+MAX_DRIVE_VELOCITY : double
+MAX_TURNING_RATE : double
+MAX_ARM_VELOCITY : double
++ManualController(keyboard, driveTrain) : ManualController
++Reset() : void
++Update() : void
+}
+
+class AutonomousController {
+#{static} MAZE_TITLE_SIZE : double
+#{static} TARGET_BEARING_PID : PID
+#{static} TURNING_RATE : double
+#driveTrain : DriveTrain
+#forwardUpdateClock : uint64
+#targetAngularVelocity : double
+#targetForwardVelocity : double
+#rangeFinder : RangeFinder
+#touchSensor : TouchSensor
+#relativeTargetBearing : double
++AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor)
+#ShouldTurnLeft() : logical
+#ShouldTurnRight() : logical
+#MoveForward() : void
+#Navigate(targetColor) : void
+#TurnLeft() : void
+#TurnRight() : void
+
+}
+
+
+}
+package "Datatypes" {
+class Queue {
+#head : LinkedListElements
+#tail : LinkedListElements
++length : uint32
++Queue() : Queue
++Enqueue(value) : void
++Dequeue(value) : any
++Get(index) : any
++Set(index, value) : void
+
+}
+class LinkedListElement {
++value : any
++next : LinkedListElement
++LinkedListElement(value) : LinkedListElement
+
+}
+class LinkedList {
+#head : LinkedListElement
+#tail : LinkedListElement
++length : uint32
+#CheckOutOfRange(index) : void
++LinkedList() : LinkedList
++Get(index) : any
++Set(index, value) : void
++Append(value) : void
++Insert(index, value) : void
++Clear() : void
++Remove(value) : void
+}
+class RangeScan {
+#minima : LinkedList
+#maxima : LinkedList
+#undefRanges : LinkedList
++RangeScan() : RangeScan
++addMinima(theta1, distance1, theta2, distance2) : void
++RangeScanExtremaPoint("min", theta1, theta2, distance2) : double
++addMaxima(theta1, distance1, theta2, distance2) : void
++addUndefinedRange(lastDefinedTheta, firstUndefinedTheta, lastUndefinedTheta, nextDefinedTheta) : void
++RangeScanRange(start, startError, stop, stopError) : double
+}
+class RangeScanRange {
++start : double
++stop : double
+startError : double
+stopError : double
+RangeScanRange(start, startError, stop, stopError) : RangeScanRange
+
+
+
+
+
+}
+class RangeScanExtremaPoint {
++type : string
++theta : double
++distance : double
++thetaError : double
++distanceError : double
++RangeScanExtremaPoint(type, theta1, theta2, distance1, distance2) : RangeScanExtremaPoint
+
+
+}
+
+
+}
+package "Enums" {
+class Colors {}
+class States {}
+
+}
+package "HardwareInterfaces" {
+
+class TouchSensor {
+#brick : Brick
+#port : uint8
++IsPressed() : logical
++IsBumped() : logical
+}
+
+
+class ColorSensor {
+#brick : Brick
+#port : uint8
++ColorSensor(brick, port) : ColorSensor
++GetColor(sensor) : Colors
+}
+
+class UltrasonicSensor {
++brick : Brick
++port : uint8
++UltrasonicSensor(brick, port) : UltrasonicSensor
++GetDistance() : double
+}
+
+
+class RangeFinder {
+#motor : Motor
+#driveTrain : DriveTrain
+#ultraSensor : UltrasonicSensor
+#targetMotorVelocity : double
+#lastScan : RangeScan
+#nextScan : RangeScan
+#lastDistance : double
+#lastTheta : double
+#last_dDdt : double
+#SCAN_OFFSET : double
+#{static} SCAN_SPEED : double
+#{static} SCAN_FOV : double
++RangeFinder(motor, ultrasonicSensor) : RangeFinder
++Start()
++Stop()
++CompleteFullScan() : RangeScan
++Update()
++GetTrueForwardBearing() : double
++GetMinDistanceForward() : double
++GetMinDistanceLeft() : double
++GetMinDistanceRight() : double
+
+
+}
+
+
+
+class PID {
+#integralErrorValues : Queue
+#integralTimeValues : Queue
+#derivativeErrorValues : Queue
+#derivativeTimeValues : Queue
+#integralErrorSum : double
+#integralTimeSum : double
+#derivativeErrorSum :double
+#derivativeTimeSum : double
+#proportionalErrorValue : double
+#lastPEV : double
+#pGain : double
+#targetIntegralTime : double
+#targetDerivativeTime : double
++PID(pGain, integralTime, derivativeTime) : PID
++reset() : void
++updateErrorState(error, elapsedTime) : void
++calculateControlOutput() : double
+}
+
+
+class Motor {
+#ANGLE_PID : PID
+#VELOCITY_PID : PID
+#brick : Brick
+#port : string
+#currentAngle : double
+#currentVelocity : double
+#currentAcceleration : double
+#measurementClock : uint64 
+#movementMode : uint8
+#angleTarget : double
+#velocityTarget : double
++Motor(brick, port) : Motor
++UpdateData() : void
++ManageSetTargets() : void
++Stop(brake) : void
++ClearTargets() : void
++SetAngleTarget(target) : void
++SetRelAngleTarget(relTarget) : void
++SetVelocityTarget(relTarget) : void
++GetCurrentAngle() : double
++GetCurrentAngleTarget() : double
++GetCurrentVelocity() : double
++GetCurrentVelocityTarget() : double
++GetCurrentAcceleration() : double
+}
+class DriveTrain {
+#WHEEL_RADIUS : double
+#TURNING_RADIUS : double
+#LEFT_VELOCITY_MULTIPLIER : double
+#RIGHT_VELOCITY_MULTIPLIER : double
+#TURNING_ERROR_THRESHOLD : double
+#brick : Brick
+#leftMotor : Motor
+#rightMotor : Motor
++DriveTrain(brick, leftMotorPort, rightMotorPort) : DriveTrain
+#VelocityToAngularVelocity(velocity) : double
+#DriveTrainRotationsToWheelRotations(degrees) : double
++TurnLeft(degreesCounterClockwise) : void
++TurnRight(degreesClockwise) : void
++SetForwardVelocity(targetVelocity) : void
++SetBackwardVelocity(targetVelocity) : void
++SetMixedMovementTargets(forwardVelocity, angularVelocityCounterClockwise): void
++ManageVelocityTargets() : void
++stop(brake) : void
+}
+}
+package "UserInput" {
+class Keyboard {
+#keysDown : LinkedList
+#inputWindow : matlab.ui.Figure
+#Keyboard() : Keyboard
+#PressKey(key) : void
+#ReleaseKey(key) : void
+#ISPressed(key) : logical
+#delete() : void
+
+}
+}
+
+class Main {
+-brick : Brick
+-driveTrain : DriveTrain
+-keyboard : Keyboard
+-arm : Motor
+-manualController : ManualController
+-rotator : Motor
+-colorSensor : ColorSensor
+-touchSensor : TouchSensor
+-ultrasonicSensor : UltrasonicSensor
+-rangeFinder : RangeFinder
+-autonomousController : AutonomousController
+-state : States
+-autonomousTargetLocations : Queue
+}
+
+PID "2" <.. Motor : Instantiates
+Motor "2" <.. DriveTrain : Instantiates 
+Motor "1" <.. RangeFinder : Instantiates
+Motor "1" <.. ManualController : Instantiates
+Motor "2" <.. Main : Instantiates
+UltrasonicSensor "1" o.. RangeFinder : Instantiates
+UltrasonicSensor "1" <.. Main : Instantiates
+RangeScan "2" <.. RangeFinder : Instantiates
+LinkedList "3" <.. RangeScan : Instantiates
+LinkedList "1" <.. Keyboard : Instantiates
+RangeScanExtremaPoint "*" <.. RangeScan : Instantiates
+RangeScanRange "*" <.. RangeScan : Instantiates
+Keyboard "1" <.. ManualController : Instantiates
+Keyboard "1" <.. Main : Instantiates
+LinkedListElement "*" <.. LinkedList : Instantiates
+LinkedListElement "*" <.. Queue : Instantiates
+DriveTrain "1" <.. RangeFinder : Reference
+DriveTrain "1" <.. Main : Instantiates
+DriveTrain "1" o.. ManualController : Aggregation
+DriveTrain "1" o.. AutonomousController : Aggregation
+ColorSensor "1" o.. AutonomousController : Aggregation
+ColorSensor "1" <.. Main : Instantiates
+RangeFinder "1" o.. AutonomousController : Aggregation
+RangeFinder "1" <.. Main : Instantiates
+TouchSensor "1" o.. AutonomousController : Aggregation
+TouchSensor "1" <.. Main : Instantiates
+Queue "4" <.. PID : Instantiates
+Queue "1" <.. Main : Instantiates
+AutonomousController "1" <.. Main : Instantiates
+ManualController "1" <.. Main : Instantiates
+States "1" <.. Main : Instantiates
+Colors "*" <-- Main : Reference
+Colors "*" <-- AutonomousController : Reference
+
+
+
+
+
+
+
+
+
+
+@enduml
