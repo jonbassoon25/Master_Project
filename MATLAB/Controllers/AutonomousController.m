@@ -113,21 +113,37 @@ classdef AutonomousController
                 % Implement navigation logic
                 if (~leftWallDetected)
                     % Turn left
+                    if (controller.DEBUG) 
+                        fprintf("Turning Left\n");
+                    end
                     controller.TurnLeft();
                 elseif (~frontWallDetected)
                     % Go forward
+                    if (controller.DEBUG) 
+                        fprintf("Moving Forward\n");
+                    end
                     controller.MoveForward();
                 elseif (~rightWallDetected)
                     % Turn right
+                    if (controller.DEBUG) 
+                        fprintf("Turning Right\n");
+                    end
                     controller.TurnRight();
                 else
                     % Turn around & go forward
+                    if (controller.DEBUG) 
+                        fprintf("Turning around\n");
+                    end
                     controller.TurnAround();
                 end
 
                 % Stop for red bars
                 if (controller.colorSensor.GetColor() == Colors.Red)
                     % Stop
+                    if (controller.DEBUG) 
+                        fprintf("Stopping\n");
+                    end
+                    
                     controller.driveTrain.Stop();
 
                     % Wait 2 seconds
