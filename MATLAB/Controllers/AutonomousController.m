@@ -20,38 +20,34 @@ classdef AutonomousController
         colorSensor ColorSensor      % The color sensor for this controller to use
         touchSensor TouchSensor      % The touch sensor for this controller to use
 
-        trueForwardBearing double % The bearing of the true forward direction relative to the direction of the drivetrain
-    end
+        forwardUpdateClock % clock for determining update time
+        end
 
     methods (Access = protected)
         function MoveForward(controller)
             % Moves the car forward while keeping it parallel to the left & right walls
+            trueForwardBearing = controller.rangeFinder.GetTrueForwardBearing();
+            bearingError = trueForwardBearing; % - 0
 
-            
-            % Temporary code
-            controller.targetForwardVelocity = controller.DRIVE_VELOCITY;
-            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
-            controller.driveTrain.MangageVelocityTargets();
+            controller.TARGET_BEARING_PID.UpdateErrorState(bearingError, toc(controller.forwardUpdateClock));
+            controller.forwardUpdateClock = tic;
+
+            controller.driveTrain.SetMixedMovementTargets(controller.DRIVE_VELOCITY, controller.TARGET_BEARING_PID.CalculateControlOutput() * controller.TURNING_RATE);
+            controller.driveTrain.ManageVelocityTargets();
         end
+
         function TurnRight(controller)
             % Turns the car through the middle of a detected opening on the right
             % This function does not return control until the turn is complete
-
-
-            % Temporary code
-            controller.targetAngularVelocity = -controller.TURNING_RATE;
-            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
-            controller.driveTrain.ManageVelocityTargets();
+            
+            
         end
+        
         function TurnLeft(controller)
             % Turns the car through the middle of a detected opening on the left
             % This function does not return control until the turn is complete
-
-
-            % Temporary code
-            controller.targetAngularVelocity = controller.TURNING_RATE;
-            controller.driveTrain.SetMixedMovementTargets(controller.targetForwardVelocity, controller.targetAngularVelocity);
-            controller.driveTrain.ManageVelocityTargets();
+            
+            
         end
     end
 
@@ -74,9 +70,6 @@ classdef AutonomousController
 
             % Populate rangefinder scan
             controller.rangeFinder.CompleteFullScan();
-
-            % Get the initial true forward bearing value
-            controller.trueForwardBearing = controller.rangeFinder.GetTrueForwardBearing();
         end
 
         function Navigate(controller, targetColor)
