@@ -19,18 +19,19 @@ classdef RangeFinder < handle
         ultraSensor UltrasonicSensor
         targetMotorVelocity double
 
-        lastScan RangeScan   % The last complete scan
-        nextScan RangeScan   % The scan that is currently being built
-        fullScanMode logical % Are we currently doing a full scan
+        lastScan RangeScan      % The last complete scan
+        nextScan RangeScan      % The scan that is currently being built
+        fullScanMode logical    % Are we currently doing a full scan
 
         lastDistance double     % The last recorded distance of the ultrasonic sensor
         lastTheta double        % The last recorded angle of the ultrasonic sensor rotator
         last_dDdT double        % The last recorded change in distance per change in theta
-        SCAN_OFFSET double = 0  % Offset of the 0 of the scan motor in degrees
+        SCAN_OFFSET double      % Offset of the 0 of the scan motor in degrees
     end
 
     methods (Access = public)
         function rangeFinder = RangeFinder(motor, driveTrain, ultrasonicSensor)
+            % Constructs a new RangeFinder object
             arguments (Input)
                 motor Motor
                 driveTrain DriveTrain
@@ -39,7 +40,6 @@ classdef RangeFinder < handle
             arguments (Output)
                 rangeFinder RangeFinder
             end
-
             rangeFinder.motor = motor;
             rangeFinder.driveTrain = driveTrain;
             rangeFinder.ultraSensor = ultrasonicSensor;
@@ -54,18 +54,34 @@ classdef RangeFinder < handle
         end
 
         function Start(rangeFinder)
+            % Starts the RangeFinder. Stop must be called to stop it
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
             rangeFinder.lastScan = RangeScan();
             rangeFinder.nextScan = RangeScan();
             rangeFinder.motor.SendOutputPower(rangeFinder.SCAN_SPEED);
         end
 
         function Stop(rangeFinder)
+            % Stops the RangeFinder
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
             rangeFinder.lastScan = RangeScan();
             rangeFinder.nextScan = RangeScan();
             rangeFinder.motor.Stop(0);
         end
 
         function scan = CompleteFullScan(rangeFinder)
+            % Generates a new last scan. Does not return control until this
+            % is complete
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
+            arguments (Output)
+                scan RangeScan % The new generated scan
+            end
             rangeFinder.nextScan = RangeScan();
             rangeFinder.lastScan = RangeScan();
             rangeFinder.fullScanMode = true;
@@ -102,6 +118,10 @@ classdef RangeFinder < handle
         end
 
         function Update(rangeFinder)
+            % Updates the RangeFinder. Start must be called before update
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
             rangeFinder.motor.UpdateData();
 
             theta = pi/180 * (rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET);
@@ -158,7 +178,12 @@ classdef RangeFinder < handle
         function bearing = GetTrueForwardBearing(rangeFinder)
             % Calculates the true forward bearing of the car based on the
             % last complete scan
-
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
+            arguments (Output)
+                bearing double % The true forward bearing relative to the current forward bearing
+            end
             % Determine the min distance to the wall left & right
             i = 0;
             leftBearing = NaN;
@@ -206,6 +231,13 @@ classdef RangeFinder < handle
         end
 
         function minDistance = GetMinDistanceForward(rangeFinder)
+            % Calculates the minimum distance to a forward wall
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
+            arguments (Output)
+                minDistance double % The minimum distance to a forward wall
+            end
             i = 0;
             forwardBearing = NaN;
             while (i < rangeFinder.lastScan.minima.length)
@@ -226,6 +258,13 @@ classdef RangeFinder < handle
         end
 
         function minDistance = GetMinDistanceLeft(rangeFinder)
+            % Calculates the minimum distance to a left wall
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
+            arguments (Output)
+                minDistance double % The minimum distance to a left wall
+            end
             i = 0;
             leftBearing = NaN;
             while (i < rangeFinder.lastScan.minima.length)
@@ -246,6 +285,13 @@ classdef RangeFinder < handle
         end
         
         function minDistance = GetMinDistanceRight(rangeFinder)
+            % Calculates the minimum distance to a right wall
+            arguments (Input)
+                rangeFinder RangeFinder % The RangeFinder object
+            end
+            arguments (Output)
+                minDistance double % The minimum distance to a right wall
+            end
             i = 0;
             rightBearing = NaN;
             while (i < rangeFinder.lastScan.minima.length)
