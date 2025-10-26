@@ -9,7 +9,7 @@ classdef RangeFinder < handle
     end
 
     properties (Constant, Access = protected)
-        SCAN_FOV double = 270   % Scan field of view in degrees
+        SCAN_FOV double = 270    % Scan field of view in degrees
         SCAN_SPEED double = 0.08 % Scan speed as a decimal of the motor power
     end
 
@@ -166,11 +166,12 @@ classdef RangeFinder < handle
             while (i < rangeFinder.lastScan.minima.length)
                 extremaPoint = rangeFinder.lastScan.minima.Get(i);
                 approxBearing = 90 - rad2deg((extremaPoint.theta1 + extremaPoint.theta2) / 2.0);
+                % Determine min left bearing
                 if (approxBearing < 0) 
                     if (isnan(leftBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (leftBearing.distance1 + leftBearing.distance2) / 2.0)
                         leftBearing = approxBearing;
                     end
-                
+                % Determine min right bearing
                 elseif (approxBearing > 0)
                     if (isnan(rightBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (rightBearing.distance1 + rightBearing.distance2) / 2.0)
                         rightBearing = approxBearing;
@@ -180,7 +181,7 @@ classdef RangeFinder < handle
 
             % Calculate the true forward bearing
             % Desmos Math Link: https://www.desmos.com/calculator/sqiqjkkxmg
-            if (~isnan(leftBearing))
+            if (~isnan(leftBearing)) % (If a minimum left bearing exists)
                 avgLeftDistance = (leftBearing.distance1 + leftBearing.distance2) / 2.0;
                 avgLeftTheta = (leftBearing.theta1 + leftBearing.theta2) / 2.0;
                 d0 = avgLeftDistance;
@@ -189,7 +190,7 @@ classdef RangeFinder < handle
                 d0 = 0.0;
                 t0 = 0.0;
             end
-            if (~isnan(rightBearing))
+            if (~isnan(rightBearing)) % (If a minimum right bearing exists)
                 avgRightDistance = (rightBearing.distance1 + rightBearing.distance2) / 2.0;
                 avgRightTheta = (rightBearing.theta1 + rightBearing.theta2) / 2.0;
                 d1 = avgRightDistance;
@@ -203,6 +204,7 @@ classdef RangeFinder < handle
             % calculate based on 1 side if a side is missing
             bearing = (180/pi) * acos((d1*cos(t1) - d0*cos(t0)) / (sqrt((d1*sin(t1)-d0*sin(t0))^2 + (d1*cos(t1)-d0*cos(t0))^2))) * sign(d1*sin(t1)-d0*sin(t0));
         end
+
         function minDistance = GetMinDistanceForward(rangeFinder)
             i = 0;
             forwardBearing = NaN;
@@ -212,20 +214,15 @@ classdef RangeFinder < handle
                 if (approxBearing >= -45 && approxBearing <= 45) 
                     if (isnan(forwardBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (forwardBearing.distance1 + forwardBearing.distance2) / 2.0)
                         forwardBearing = approxBearing;
-
                     end
-
                 end
                 i = i + 1;
             end
-            
             if (isnan(forwardBearing))
                 minDistance = NaN; 
-
             else
                 minDistance = min(forwardBearing.distance2, forwardBearing.distance1);
             end
-
         end
 
         function minDistance = GetMinDistanceLeft(rangeFinder)
@@ -237,16 +234,12 @@ classdef RangeFinder < handle
                 if (approxBearing < -45) 
                     if (isnan(leftBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (leftBearing.distance1 + leftBearing.distance2) / 2.0)
                         leftBearing = approxBearing;
-
                     end
-
                 end
                 i = i + 1;
             end
-            
             if (isnan(leftBearing))
                 minDistance = NaN; 
-
             else
                 minDistance = min(leftBearing.distance2, leftBearing.distance1);
             end
@@ -261,21 +254,15 @@ classdef RangeFinder < handle
                 if (approxBearing < -45) 
                     if (isnan(rightBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (rightBearing.distance1 + rightBearing.distance2) / 2.0)
                         rightBearing = approxBearing;
-
                     end
-
                 end
                 i = i + 1;
             end
-            
             if (isnan(rightBearing))
                 minDistance = NaN; 
-
             else
                 minDistance = min(rightBearing.distance2, rightBearing.distance1);
             end
-
         end
-
     end
 end
