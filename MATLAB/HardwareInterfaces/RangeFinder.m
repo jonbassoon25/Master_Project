@@ -212,8 +212,8 @@ classdef RangeFinder < handle
             end
 
             if (rangeFinder.DEBUG)
-                fprintf("Left bearing between: (%.2f, %.2f)", leftBearing.theta1, leftBearing.theta2);
-                fprintf("Right bearing between: (%.2f, %.2f)", rightBearing.theta1, rightBearing.theta2);
+                fprintf("Left bearing between: (%.2f, %.2f)\n", leftBearing.theta1, leftBearing.theta2);
+                fprintf("Right bearing between: (%.2f, %.2f)\n", rightBearing.theta1, rightBearing.theta2);
             end
 
             % Calculate the true forward bearing
@@ -265,7 +265,7 @@ classdef RangeFinder < handle
             end
 
             if (rangeFinder.DEBUG)
-                fprintf("Forward bearing between: (%.2f, %.2f)", forwardBearing.theta1, forwardBearing.theta2);
+                fprintf("Forward bearing between: (%.2f, %.2f)\n", forwardBearing.theta1, forwardBearing.theta2);
             end
             
             if (isnan(forwardBearing))
@@ -275,7 +275,7 @@ classdef RangeFinder < handle
             end
 
             if (rangeFinder.DEBUG)
-                fprintf("Min Distance Forward: %.2f", minDistance);
+                fprintf("Min Distance Forward: %.2f\n", minDistance);
             end
         end
 
@@ -301,7 +301,7 @@ classdef RangeFinder < handle
             end
 
             if (rangeFinder.DEBUG)
-                fprintf("Left bearing between: (%.2f, %.2f)", leftBearing.theta1, leftBearing.theta2);
+                fprintf("Left bearing between: (%.2f, %.2f)\n", leftBearing.theta1, leftBearing.theta2);
             end
 
             if (isnan(leftBearing))
@@ -311,7 +311,7 @@ classdef RangeFinder < handle
             end
             
             if (rangeFinder.DEBUG)
-                fprintf("Min Distance Left: %.2f", minDistance);
+                fprintf("Min Distance Left: %.2f\n", minDistance);
             end
         end
         
@@ -336,7 +336,7 @@ classdef RangeFinder < handle
                 i = i + 1;
             end
             if (rangeFinder.DEBUG)
-                fprintf("Right bearing between: (%.2f, %.2f)", rightBearing.theta1, rightBearing.theta2);
+                fprintf("Right bearing between: (%.2f, %.2f)\n", rightBearing.theta1, rightBearing.theta2);
             end
 
             if (isnan(rightBearing))
@@ -346,7 +346,7 @@ classdef RangeFinder < handle
             end
 
             if (rangeFinder.DEBUG)
-                fprintf("Min Distance Right: %.2f", minDistance);
+                fprintf("Min Distance Right: %.2f\n", minDistance);
             end
         end
     end
