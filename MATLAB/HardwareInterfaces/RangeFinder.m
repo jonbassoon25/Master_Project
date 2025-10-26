@@ -203,29 +203,79 @@ classdef RangeFinder < handle
             % calculate based on 1 side if a side is missing
             bearing = (180/pi) * acos((d1*cos(t1) - d0*cos(t0)) / (sqrt((d1*sin(t1)-d0*sin(t0))^2 + (d1*cos(t1)-d0*cos(t0))^2))) * sign(d1*sin(t1)-d0*sin(t0));
         end
-        
-        function distance = GetMinDistanceBearing(rangeFinder, degrees, relativeBearing)
-            arguments (Input)
-                rangeFinder RangeFinder % This rangefinder object
-                degrees double          % The bearing in degrees to check
-                relativeBearing logical % Is the bearing relative to the car (1) or to the maze (0)
-            end
-            arguments (Output)
-                distance double % The approximate distance to the wall in the specified direction
-            end
-            % Calculates the true minimum distance to a wall in the
-            % specified direction from forwards or NaN if no real distance
-            % exists
+        function minDistance = GetMinDistanceForward(rangeFinder)
+            i = 0;
+            forwardBearing = NaN;
+            while (i < rangeFinder.lastScan.minima.length)
+                extremaPoint = rangeFinder.lastScan.minima.Get(i);
+                approxBearing = 90 - rad2deg((extremaPoint.theta1 + extremaPoint.theta2) / 2.0);
+                if (approxBearing >= -45 && approxBearing <= 45) 
+                    if (isnan(forwardBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (forwardBearing.distance1 + forwardBearing.distance2) / 2.0)
+                        forwardBearing = approxBearing;
 
-            % TODO: Implement
-        end
+                    end
 
-        function distance = GetMaxDistanceBearing(rangeFinder, degrees, relativeBearing)
-            % Calculates the true maximum distance to a wall in the
-            % specified direction from forwards or NaN if no real distance
-            % exists
+                end
+                i = i + 1;
+            end
             
-            % TODO: Implement
+            if (isnan(forwardBearing))
+                minDistance = NaN; 
+
+            else
+                minDistance = min(forwardBearing.distance2, forwardBearing.distance1);
+            end
+
         end
+
+        function minDistance = GetMinDistanceLeft(rangeFinder)
+            i = 0;
+            leftBearing = NaN;
+            while (i < rangeFinder.lastScan.minima.length)
+                extremaPoint = rangeFinder.lastScan.minima.Get(i);
+                approxBearing = 90 - rad2deg((extremaPoint.theta1 + extremaPoint.theta2) / 2.0);
+                if (approxBearing < -45) 
+                    if (isnan(leftBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (leftBearing.distance1 + leftBearing.distance2) / 2.0)
+                        leftBearing = approxBearing;
+
+                    end
+
+                end
+                i = i + 1;
+            end
+            
+            if (isnan(leftBearing))
+                minDistance = NaN; 
+
+            else
+                minDistance = min(leftBearing.distance2, leftBearing.distance1);
+            end
+        end
+        
+        function minDistance = GetMinDistanceRight(rangeFinder)
+            i = 0;
+            rightBearing = NaN;
+            while (i < rangeFinder.lastScan.minima.length)
+                extremaPoint = rangeFinder.lastScan.minima.Get(i);
+                approxBearing = 90 - rad2deg((extremaPoint.theta1 + extremaPoint.theta2) / 2.0);
+                if (approxBearing < -45) 
+                    if (isnan(rightBearing) || (approxBearing.distance1 + approxBearing.distance2) / 2.0 < (rightBearing.distance1 + rightBearing.distance2) / 2.0)
+                        rightBearing = approxBearing;
+
+                    end
+
+                end
+                i = i + 1;
+            end
+            
+            if (isnan(rightBearing))
+                minDistance = NaN; 
+
+            else
+                minDistance = min(rightBearing.distance2, rightBearing.distance1);
+            end
+
+        end
+
     end
 end

@@ -103,9 +103,9 @@ classdef AutonomousController
                 controller.rangeFinder.Update();
 
                 % Collect distance data
-                distanceFront = controller.rangeFinder.GetMinDistanceBearing(0.0, false);
-                distanceLeft = controller.rangeFinder.GetMinDistanceBearing(-90.0, false);
-                distanceRight = controller.rangeFinder.GetMinDistanceBearing(90.0, false);
+                distanceFront = controller.rangeFinder.GetMinDistanceForward();
+                distanceLeft = controller.rangeFinder.GetMinDistanceLeft();
+                distanceRight = controller.rangeFinder.GetMinDistanceRight();
                 
                 % Calculate navigation booleans
                 wallDetectionThreshold = controller.MAZE_TILE_SIZE / 2.0;
