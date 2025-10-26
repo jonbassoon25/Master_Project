@@ -37,17 +37,21 @@ classdef AutonomousController
         end
 
         function TurnLeft(controller)
-            % Turns the car through the middle of a detected opening on the left
-            % This function does not return control until the turn is complete
+            % Turns the car left
             controller.driveTrain.Stop();
             controller.driveTrain.TurnLeft(90);
         end
 
         function TurnRight(controller)
-            % Turns the car through the middle of a detected opening on the right
-            % This function does not return control until the turn is complete
+            % Turns the car right
             controller.driveTrain.Stop();
             controller.driveTrain.TurnLeft(-90);
+        end
+
+        function TurnAround(controller)
+            % Turns the car around
+            controller.driveTrain.Stop();
+            controller.driveTrain.TurnLeft(180);
         end
     end
 
@@ -109,12 +113,16 @@ classdef AutonomousController
                 % Implement navigation logic
                 if (~leftWallDetected)
                     % Turn left
+                    controller.TurnLeft();
                 elseif (~frontWallDetected)
                     % Go forward
+                    controller.MoveForward();
                 elseif (~rightWallDetected)
                     % Turn right
+                    controller.TurnRight();
                 else
                     % Turn around & go forward
+                    controller.TurnAround();
                 end
 
                 % Stop for red bars
