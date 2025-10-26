@@ -1,8 +1,8 @@
 classdef RangeFinder < handle
     % Controls the RangeFinder of the vehicle
 
-    %TODO: FIX BEARING DEGREES SO THAT THEY ARE CLOCKWISE FOR +rad INSTEAD OF COUNTERCLOCKWISE FOR +rad
-    %TODO: RECORD THETA & DISTANCE OF N-2 TO N FOR MIN/MAX RANGES INSTEAD OF N-1 TO N
+    % (Done) FIX BEARING DEGREES SO THAT THEY ARE CLOCKWISE FOR +rad INSTEAD OF COUNTERCLOCKWISE FOR +rad
+    % (Done) RECORD THETA & DISTANCE OF N-2 TO N FOR MIN/MAX RANGES INSTEAD OF N-1 TO N
 
     properties (Constant, Access = private)
         DEBUG = true
@@ -26,6 +26,8 @@ classdef RangeFinder < handle
 
         lastDistance double     % The last recorded distance of the ultrasonic sensor
         lastTheta double        % The last recorded angle of the ultrasonic sensor rotator
+        lastlastDistance double
+        lastlastTheta double
         last_dDdT double        % The last recorded change in distance per change in theta
         SCAN_OFFSET double      % Offset of the 0 of the scan motor in degrees
     end
@@ -52,6 +54,8 @@ classdef RangeFinder < handle
             rangeFinder.lastDistance = rangeFinder.ultraSensor.GetDistance();
             rangeFinder.lastTheta = rangeFinder.motor.GetCurrentAngle();
             rangeFinder.last_dDdT = 0.0;
+            rangeFinder.lastlastDistance = rangeFinder.lastDistance;
+            rangeFinder.lastlastTheta = rangeFinder.lastTheta;
         end
 
         function Start(rangeFinder)
@@ -145,19 +149,21 @@ classdef RangeFinder < handle
 
             elseif ((rangeFinder.last_dDdT <= 0) && (dDistance_dTheta >= 0))
                 % There is a minimum distance to the measured surface
-                rangeFinder.nextScan.addMinima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
+                rangeFinder.nextScan.addMinima(rangeFinder.lastlastTheta, rangeFinder.lastlastDistance, theta, correctedDistance);
                 if (rangeFinder.DEBUG)
-                    fprintf("A local minimum was detected between %.2f rad and %.2f rad at (%.2fcm, %.2fcm)\n", rangeFinder.lastTheta, theta, rangeFinder.lastDistance, correctedDistance);
+                    fprintf("A local minimum was detected between %.2f rad and %.2f rad at (%.2fcm, %.2fcm)\n", rangeFinder.lastlastTheta, theta, rangeFinder.lastlastDistance, correctedDistance);
                 end
                 
             elseif ((rangeFinder.last_dDdT >= 0) && (dDistance_dTheta <= 0))
                 % There is a maximum distance to the measured surface
-                rangeFinder.nextScan.addMaxima(rangeFinder.lastTheta, rangeFinder.lastDistance, theta, correctedDistance);
+                rangeFinder.nextScan.addMaxima(rangeFinder.lastlastTheta, rangeFinder.lastlastDistance, theta, correctedDistance);
                 if (rangeFinder.DEBUG)
-                    fprintf("A local maximum was detected between %.2f rad and %.2f rad (%.2fcm, %.2fcm)\n", rangeFinder.lastTheta, theta, rangeFinder.lastDistance, correctedDistance);
+                    fprintf("A local maximum was detected between %.2f rad and %.2f rad (%.2fcm, %.2fcm)\n", rangeFinder.lastlastTheta, theta, rangeFinder.lastlastDistance, correctedDistance);
                 end
             end
 
+            rangeFinder.lastlastDistance = rangeFinder.lastDistance;
+            rangeFinder.lastlastTheta = rangeFinder.lastTheta;
             rangeFinder.lastDistance = distance;
             rangeFinder.lastTheta = theta;
             rangeFinder.last_dDdT = dDistance_dTheta;
