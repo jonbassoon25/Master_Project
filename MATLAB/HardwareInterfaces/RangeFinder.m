@@ -8,6 +8,7 @@ classdef RangeFinder < handle
         DEBUG = true
     end
 
+
     properties (Constant, Access = protected)
         SCAN_FOV double = 270    % Scan field of view in degrees
         SCAN_SPEED double = 0.08 % Scan speed as a decimal of the motor power
@@ -132,8 +133,10 @@ classdef RangeFinder < handle
             correctedDistance = distance + dot(velocity, u);
             
             dDistance_dTheta = (correctedDistance - rangeFinder.lastDistance) / (theta - rangeFinder.lastTheta);
-            fprintf("Recorded angle: %.2frad\nRecorded distance: %.2fcm\nCorrected distance: %.2fcm\ndDistance_dTheta: %.2fcm/rad\n", theta, distance, correctedDistance, dDistance_dTheta);
-            
+            if (rangeFinder.DEBUG)
+                fprintf("Recorded angle: %.2frad\nRecorded distance: %.2fcm\nCorrected distance: %.2fcm\ndDistance_dTheta: %.2fcm/rad\n", theta, distance, correctedDistance, dDistance_dTheta);
+            end
+
             if ((dDistance_dTheta == 0) && (rangeFinder.last_dDdT == 0))
                 % Cannot determine max or min
                 if (rangeFinder.DEBUG)
@@ -161,13 +164,17 @@ classdef RangeFinder < handle
 
             % Turn motor around and update last scan if it is out of rotation range
             if (180/pi * theta > rangeFinder.SCAN_FOV / 2.0)
-                fprintf("Updating last scan. Motor past upper FOV bound.\n");
+                if (rangeFinder.DEBUG)
+                    fprintf("Updating last scan. Motor past upper FOV bound.\n");
+                end
                 rangeFinder.motor.SendOutputPower(-rangeFinder.SCAN_SPEED);
                 rangeFinder.lastScan = rangeFinder.nextScan;
                 rangeFinder.nextScan = RangeScan();
                 rangeFinder.fullScanMode = false;
             elseif (180/pi * theta < -rangeFinder.SCAN_FOV / 2.0)
-                fprintf("Updating last scan. Motor past lower FOV bound.\n");
+                if (rangeFinder.DEBUG)
+                    fprintf("Updating last scan. Motor past lower FOV bound.\n");
+                end
                 rangeFinder.motor.SendOutputPower(rangeFinder.SCAN_SPEED);
                 rangeFinder.lastScan = rangeFinder.nextScan;
                 rangeFinder.nextScan = RangeScan();
@@ -204,6 +211,11 @@ classdef RangeFinder < handle
                 end
             end
 
+            if (rangeFinder.DEBUG)
+                fprintf("Left bearing between: (%.2f, %.2f)", leftBearing.theta1, leftBearing.theta2);
+                fprintf("Right bearing between: (%.2f, %.2f)", rightBearing.theta1, rightBearing.theta2);
+            end
+
             % Calculate the true forward bearing
             % Desmos Math Link: https://www.desmos.com/calculator/sqiqjkkxmg
             if (~isnan(leftBearing)) % (If a minimum left bearing exists)
@@ -215,6 +227,7 @@ classdef RangeFinder < handle
                 d0 = 0.0;
                 t0 = 0.0;
             end
+
             if (~isnan(rightBearing)) % (If a minimum right bearing exists)
                 avgRightDistance = (rightBearing.distance1 + rightBearing.distance2) / 2.0;
                 avgRightTheta = (rightBearing.theta1 + rightBearing.theta2) / 2.0;
@@ -250,10 +263,19 @@ classdef RangeFinder < handle
                 end
                 i = i + 1;
             end
+
+            if (rangeFinder.DEBUG)
+                fprintf("Forward bearing between: (%.2f, %.2f)", forwardBearing.theta1, forwardBearing.theta2);
+            end
+            
             if (isnan(forwardBearing))
                 minDistance = NaN; 
             else
                 minDistance = min(forwardBearing.distance2, forwardBearing.distance1);
+            end
+
+            if (rangeFinder.DEBUG)
+                fprintf("Min Distance Forward: %.2f", minDistance);
             end
         end
 
@@ -277,10 +299,19 @@ classdef RangeFinder < handle
                 end
                 i = i + 1;
             end
+
+            if (rangeFinder.DEBUG)
+                fprintf("Left bearing between: (%.2f, %.2f)", leftBearing.theta1, leftBearing.theta2);
+            end
+
             if (isnan(leftBearing))
                 minDistance = NaN; 
             else
                 minDistance = min(leftBearing.distance2, leftBearing.distance1);
+            end
+            
+            if (rangeFinder.DEBUG)
+                fprintf("Min Distance Left: %.2f", minDistance);
             end
         end
         
@@ -304,10 +335,18 @@ classdef RangeFinder < handle
                 end
                 i = i + 1;
             end
+            if (rangeFinder.DEBUG)
+                fprintf("Right bearing between: (%.2f, %.2f)", rightBearing.theta1, rightBearing.theta2);
+            end
+
             if (isnan(rightBearing))
                 minDistance = NaN; 
             else
                 minDistance = min(rightBearing.distance2, rightBearing.distance1);
+            end
+
+            if (rangeFinder.DEBUG)
+                fprintf("Min Distance Right: %.2f", minDistance);
             end
         end
     end
