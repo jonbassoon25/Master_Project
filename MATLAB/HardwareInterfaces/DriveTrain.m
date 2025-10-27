@@ -2,7 +2,7 @@ classdef DriveTrain < handle
     % The DriveTrain controls the two motors of a vehicle to perform complex manuevers
     
     properties (Constant, Access=private)
-        DEBUG logical = true % Display debug information at runtime
+        DEBUG logical = false % Display debug information at runtime
     end
 
     properties (Constant, Access = protected)
@@ -121,6 +121,9 @@ classdef DriveTrain < handle
         end
 
         function vel = GetForwardVelocity(driveTrain)
+            arguments (Output)
+                vel double
+            end
             vel = (driveTrain.leftMotor.GetCurrentVelocityTarget() + driveTrain.rightMotor.GetCurrentVelocityTarget()) ^ (0.5);
         end
 

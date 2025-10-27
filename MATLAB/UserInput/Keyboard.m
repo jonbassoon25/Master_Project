@@ -2,7 +2,7 @@ classdef Keyboard < handle
     % A keyboard user input interface
     
     properties (Constant, Access=private)
-        DEBUG logical = true % Display debug information at runtime
+        DEBUG logical = false % Display debug information at runtime
     end
 
     properties (Access = protected)

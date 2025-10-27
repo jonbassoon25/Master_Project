@@ -5,10 +5,10 @@ keyboard = Keyboard();
 arm = Motor(brick, 'C');
 manualController = ManualController(keyboard, driveTrain, arm);
 rotator = Motor(brick, 'B');
-colorSensor = ColorSensor(brick, -1);
-touchSensor = TouchSensor(brick, -1);
-ultrasonicSensor = UltrasonicSensor(brick, -1);
-rangeFinder = RangeFinder(rotator, ultrasonicSensor);
+colorSensor = ColorSensor(brick, 4);
+touchSensor = TouchSensor(brick, 1);
+ultrasonicSensor = UltrasonicSensor(brick, 3);
+rangeFinder = RangeFinder(rotator, driveTrain, ultrasonicSensor);
 autonomousController = AutonomousController(driveTrain, rangeFinder, colorSensor, touchSensor);
 
 state = States.ManualControl; % Initial State
@@ -19,7 +19,6 @@ autonomousTargetLocations.Enqueue(Colors.Yellow); % Location #2
 
 while state ~= States.Exit
     pause(0.05); % Allow keyboard to take input
-
     switch (state)
         case States.ManualControl
             manualController.Update()
@@ -28,8 +27,11 @@ while state ~= States.Exit
             if (keyboard.IsPressed("q"))
                 state = States.Exit;
             elseif (keyboard.IsPressed("v"))
+                fprintf("Switching to Automatic Control...\n");
                 manualController.Reset();
+                fprintf("1\n");
                 state = States.AutonomousControl;
+                fprintf("2\n");
             end
 
         case States.AutonomousControl
@@ -49,7 +51,7 @@ while state ~= States.Exit
             state = states.ManualControl;
             
         otherwise % Invalid State
-            fprintf("Invalid State Encoding: %d. Defaulting to Manual Control.\n", state);
+            fprintf("Invalid State. Defaulting to Manual Control.\n");
             state = States.ManualControl;
     end
 end

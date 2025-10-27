@@ -2,7 +2,7 @@ classdef ManualController < handle
     % Controls the provided DriveTrain given keyboard input
 
     properties (Constant, Access=private)
-        DEBUG logical = true % Display debug information at runtime
+        DEBUG logical = false % Display debug information at runtime
     end
 
     properties (Access = protected, Constant)

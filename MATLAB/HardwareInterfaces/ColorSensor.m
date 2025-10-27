@@ -29,11 +29,23 @@ classdef ColorSensor
                 color Colors % The color enumeration value of the sensed color
             end
             colorCode = sensor.brick.ColorCode(sensor.port);
-            for checkColor = enumeration(Colors)'
-                if (uint8(checkColor) == colorCode)
-                    color = checkColor;
-                    break;
-                end
+            switch colorCode
+              case uint8(Colors.Undefined)
+                  color = Colors.Undefined;
+              case uint8(Colors.Black)
+                  color = Colors.Black;
+                case uint8(Colors.Blue)
+                  color = Colors.Blue;
+              case uint8(Colors.Green)
+                  color = Colors.Green;
+              case uint8(Colors.Yellow)
+                  color = Colors.Yellow;
+              case uint8(Colors.Red)
+                  color = Colors.Red;
+                case uint8(Colors.White)
+                  color = Colors.White;
+              case uint8(Colors.Brown)
+                  color = Colors.Brown;
             end
         end
     end

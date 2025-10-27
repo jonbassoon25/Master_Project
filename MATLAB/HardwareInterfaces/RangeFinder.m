@@ -5,7 +5,7 @@ classdef RangeFinder < handle
     % (Done) RECORD THETA & DISTANCE OF N-2 TO N FOR MIN/MAX RANGES INSTEAD OF N-1 TO N
 
     properties (Constant, Access = private)
-        DEBUG = true
+        DEBUG = false
     end
 
 
@@ -132,6 +132,8 @@ classdef RangeFinder < handle
             theta = pi/180 * (rangeFinder.motor.GetCurrentAngle() - rangeFinder.SCAN_OFFSET);
             distance = rangeFinder.ultraSensor.GetDistance();
             velocity = [0, rangeFinder.driveTrain.GetForwardVelocity()];
+
+            fprintf("Forward velocity: %f", rangeFinder.driveTrain.GetForwardVelocity());
 
             u = [cos(theta), sin(theta)];
             correctedDistance = distance + dot(velocity, u);

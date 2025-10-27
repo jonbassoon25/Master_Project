@@ -2,7 +2,7 @@ classdef AutonomousController
     % Controls the provided DriveTrain automatically with the provided sensors
 
     properties (Constant, Access = private)
-        DEBUG logical = false % Enable/Disable debug logs
+        DEBUG logical = true % Enable/Disable debug logs
     end
 
     properties (Constant, Access = protected)
@@ -71,9 +71,6 @@ classdef AutonomousController
             controller.rangeFinder = rangeFinder;
             controller.colorSensor = colorSensor;
             controller.touchSensor = touchSensor;
-
-            % Populate rangefinder scan
-            controller.rangeFinder.CompleteFullScan();
         end
 
         function Navigate(controller, targetColor)
@@ -89,7 +86,10 @@ classdef AutonomousController
             %   -  If the is an opening to the front and/or right, continue forwards
             %   -  If there is an opening on the right, turn right
             %   -  If there is no opening to the left, front, or right, turn around & move forwards
-            %   -  If there is a red line at any point, stop for 2 seconds
+            %   -  If there is a red line at any point, stop for 2 seconds            
+
+            % Populate rangefinder scan
+            controller.rangeFinder.CompleteFullScan();
 
             % Start the rangeFinder
             controller.rangeFinder.Start();
